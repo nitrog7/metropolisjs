@@ -1,0 +1,13 @@
+.vscode
+build
+changelog.tmp.md
+coverage
+node_modules
+src
+.eslintrc
+.gitignore
+.travis.yml
+lex.config.js
+package-lock.json
+tsconfig.build.json
+tsconfig.json

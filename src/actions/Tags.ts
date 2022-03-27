@@ -29,7 +29,7 @@ export class Tags {
     this.flux = flux;
   }
 
-  async addTag(tag: Partial<Tag>, tagProps: string[]) {
+  async addTag(tag: Partial<Tag>, tagProps: string[] = []) {
     try {
       const queryVariables = {
         tag: {
@@ -50,7 +50,7 @@ export class Tags {
     }
   }
 
-  async addTagToProfile(tagId: string, tagProps: string[]) {
+  async addTagToProfile(tagId: string, tagProps: string[] = []) {
     try {
       const queryVariables = {
         tagId: {
@@ -75,7 +75,7 @@ export class Tags {
     }
   }
 
-  async deleteTag(tagId: string, tagProps: string[]) {
+  async deleteTag(tagId: string, tagProps: string[] = []) {
     try {
       const queryVariables = {
         tagId: {
@@ -101,7 +101,7 @@ export class Tags {
     }
   }
 
-  async deleteTagFromProfile(tagId: string, tagProps: string[]) {
+  async deleteTagFromProfile(tagId: string, tagProps: string[] = []) {
     try {
       const queryVariables = {
         tagId: {
@@ -169,7 +169,7 @@ export class Tags {
     }
   }
 
-  async updateTag(tag: Partial<Tag>, tagProps: string[], CustomClass = Tag) {
+  async updateTag(tag: Partial<Tag>, tagProps: string[] = [], CustomClass = Tag) {
     try {
       const queryVariables = {
         tag: {

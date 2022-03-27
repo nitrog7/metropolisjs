@@ -484,6 +484,7 @@ export class Users {
         return this.flux.dispatch({session: new User(signIn), type: USER_SIGNIN_SUCCESS});
       };
 
+      console.log({publicMutation});
       return await publicMutation(this.flux, 'signIn', queryVariables, ['expires', 'issued', 'token'], {onSuccess});
     } catch(error) {
       return this.flux.dispatch({error, type: USER_SIGNIN_ERROR});

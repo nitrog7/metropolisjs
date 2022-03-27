@@ -4,8 +4,6 @@
  */
 import {FluxFramework} from '@nlabs/arkhamjs';
 import {get as httpGet} from '@nlabs/rip-hunter';
-import isEmpty from 'lodash/isEmpty';
-import pDebounce from 'p-debounce';
 
 import {Location} from '../adapters/Location';
 import {Config} from '../config';
@@ -22,12 +20,15 @@ import {
   LOCATION_UPDATE_ERROR,
   LOCATION_UPDATE_SUCCESS
 } from '../stores/locationStore';
-import {ApiResultsType, appMutation, appQuery} from '../utils/api';
+import {ApiResultsType, appMutation} from '../utils/api';
+import {autoCompleteLocation} from '../utils/location';
 
 export class Locations {
+  CustomAdapter: any;
   flux: FluxFramework;
 
-  constructor(flux: FluxFramework) {
+  constructor(flux: FluxFramework, CustomAdapter: any = Location) {
+    this.CustomAdapter = CustomAdapter;
     this.flux = flux;
   }
 
@@ -38,45 +39,7 @@ export class Locations {
     locationProps: string[] = [],
     CustomClass: any = Location
   ) {
-    const results = await pDebounce(async (
-      address: string,
-      latitude?: number,
-      longitude?: number,
-      locationProps: string[] = []
-    ): Promise<any[]> => {
-      if(isEmpty(address)) {
-        return [];
-      }
-
-      try {
-        const queryVariables = {
-          address: {
-            type: 'String',
-            value: address
-          },
-          latitude: {
-            type: 'Float',
-            value: latitude
-          },
-          longitude: {
-            type: 'Float',
-            value: longitude
-          }
-        };
-
-        const {autoCompleteLocation = []} = await appQuery(this.flux, 'autoCompleteLocation', queryVariables, [
-          'address',
-          'latitude',
-          'longitude',
-          ...locationProps
-        ]);
-        return autoCompleteLocation.map((item) => new CustomClass(item));
-      } catch(error) {
-        return [];
-      }
-    }, 500);
-
-    return results;
+    return autoCompleteLocation(this.flux, address, latitude, longitude, locationProps, CustomClass);
   }
 
   async addLocation(location: any, locationProps: string[] = [], CustomClass = Location): Promise<any> {

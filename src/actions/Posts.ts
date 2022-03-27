@@ -21,9 +21,11 @@ import {
 import {ApiResultsType, appMutation, appQuery} from '../utils/api';
 
 export class Posts {
+  CustomAdapter: any;
   flux: FluxFramework;
 
-  constructor(flux: FluxFramework) {
+  constructor(flux: FluxFramework, CustomAdapter: any = Post) {
+    this.CustomAdapter = CustomAdapter;
     this.flux = flux;
   }
 
@@ -196,7 +198,7 @@ export class Posts {
   }
 
   async getPostsByReactions(
-    reactionName: string,
+    reactionNames: string[],
     latitude: number,
     longitude: number,
     from: number = 0,
@@ -218,9 +220,9 @@ export class Posts {
           type: 'Int',
           value: parseNum(from)
         },
-        reactionName: {
-          type: 'String',
-          value: parseString(reactionName)
+        reactionNames: {
+          type: '[String]',
+          value: reactionNames.map((name) => parseString(name))
         },
         to: {
           type: 'Int',

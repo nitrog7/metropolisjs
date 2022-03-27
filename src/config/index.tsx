@@ -2,9 +2,10 @@
  * Copyright (c) 2018-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import {FluxFramework} from '@nlabs/arkhamjs';
 import get from 'lodash/get';
 import merge from 'lodash/merge';
+
+import {MetropolisAdapters} from '../utils/MetropolisProvider';
 
 export interface ConfigAppSessionType {
   readonly maxMinutes?: number;
@@ -23,29 +24,27 @@ export interface ConfigAppType {
 }
 
 export interface MetropolisConfiguration {
+  readonly adapters?: MetropolisAdapters;
   readonly appConfig?: Partial<ConfigAppType>;
   readonly isAuth?: () => boolean;
 }
 
 export class Config {
-  static flux: FluxFramework;
   static values: any = {};
 
   static setConfig(values: object): any {
-    return merge(this.values, values);
+    this.values = merge(this.values, values);
+    return this.values;
   }
 
-  static get(path: string | string[], defaultValue?: any): any {
+  static get(path?: string | string[], defaultValue?: any): any {
     const environment: string = process.env.NODE_ENV || 'development';
     const configValues: object = {...this.values, environment};
+
+    if(!path) {
+      return configValues;
+    }
+
     return get(configValues, path, defaultValue);
-  }
-
-  static getFlux(): FluxFramework {
-    return this.flux;
-  }
-
-  static setFlux(flux: FluxFramework): void {
-    this.flux = flux;
   }
 }

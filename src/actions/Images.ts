@@ -23,13 +23,15 @@ import {ApiResultsType, appMutation, appQuery, uploadImage} from '../utils/api';
 import {convertFileToBase64} from '../utils/file';
 
 export class Images {
+  CustomAdapter: any;
   flux: FluxFramework;
 
-  constructor(flux: FluxFramework) {
+  constructor(flux: FluxFramework, CustomAdapter: any = Image) {
+    this.CustomAdapter = CustomAdapter;
     this.flux = flux;
   }
 
-  async addUserImage(image: Partial<Image>, type: string = 'image', CustomClass: any = Image): Promise<any> {
+  async addImage(image: Partial<Image>, type: string = 'image', CustomClass: any = Image): Promise<any> {
     try {
       const {base64, description, itemId} = new Image(image).getInput();
       const formatImage = {
@@ -40,7 +42,7 @@ export class Images {
         itemType: type
       };
 
-      const {image: newImage} = await uploadImage(formatImage);
+      const {image: newImage} = await uploadImage(this.flux, formatImage);
       return this.flux.dispatch({image: new CustomClass(newImage), type: IMAGE_ADD_SUCCESS});
     } catch(error) {
       return this.flux.dispatch({error, type: IMAGE_ADD_ERROR});
@@ -67,13 +69,31 @@ export class Images {
     }
   }
 
+  async updateImage(image: Partial<Image>, type: string = 'image', CustomClass: any = Image): Promise<any> {
+    try {
+      const {base64, description, itemId} = new Image(image).getInput();
+      const formatImage = {
+        base64,
+        description: description ? parseString(description, 500) : undefined,
+        fileType: 'image/jpeg',
+        itemId,
+        itemType: type
+      };
+
+      const {image: newImage} = await uploadImage(this.flux, formatImage);
+      return this.flux.dispatch({image: new CustomClass(newImage), type: IMAGE_ADD_SUCCESS});
+    } catch(error) {
+      return this.flux.dispatch({error, type: IMAGE_ADD_ERROR});
+    }
+  }
+
   async uploadFileImages(imageFiles: File[], itemId: string, itemType: string = 'users'): Promise<any> {
     try {
       const savedImages = await Promise.all(
         imageFiles.map(async (file: File) => {
           const base64: string = await convertFileToBase64(file, Config.get('app.images.maxImageSize'));
           const {type: fileType} = file;
-          return this.addUserImage({base64, fileType, itemId}, itemType);
+          return this.addImage({base64, fileType, itemId}, itemType);
         })
       );
 

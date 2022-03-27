@@ -4,8 +4,20 @@
  */
 import React, {createContext} from 'react';
 
+export interface MetropolisAdapters {
+  readonly Event?: any;
+  readonly Image?: any;
+  readonly Location?: any;
+  readonly Message?: any;
+  readonly Post?: any;
+  readonly Reaction?: any;
+  readonly Tag?: any;
+  readonly User?: any;
+}
+
 export interface MetropolisProviderProps {
   readonly children?: any;
+  readonly adapters?: MetropolisAdapters;
   readonly isAuth?: () => boolean;
   readonly messages?: any[];
   readonly notifications?: any[];
@@ -17,6 +29,7 @@ export interface MetropolisProviderProps {
 const isAuth = () => true;
 
 export const MetropolisContext = createContext({
+  adapters: undefined,
   isAuth,
   messages: [],
   notifications: [],
@@ -26,6 +39,7 @@ export const MetropolisContext = createContext({
 });
 
 export const MetropolisProvider = ({
+  adapters,
   children,
   isAuth,
   messages,
@@ -36,6 +50,7 @@ export const MetropolisProvider = ({
 }: MetropolisProviderProps) => (
   <MetropolisContext.Provider
     value={{
+      adapters,
       isAuth,
       messages,
       session,

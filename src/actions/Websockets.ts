@@ -8,7 +8,7 @@ import Sockette from 'sockette';
 import {Config} from '../config';
 import {WEBSOCKET_CLOSE, WEBSOCKET_ERROR, WEBSOCKET_MESSAGE, WEBSOCKET_OPEN} from '../stores/websocketStore';
 
-export class Websocket {
+export class Websockets {
   flux: FluxFramework;
   ws: Sockette;
 
@@ -23,7 +23,7 @@ export class Websocket {
     }
   }
 
-  onRecieve(event) {
+  onReceive(event) {
     const {data: eventData, timeStamp: timestamp} = event;
     const data = JSON.parse(eventData);
     console.log('websockets::onRecieve::data', data);
@@ -52,7 +52,7 @@ export class Websocket {
       return this.ws;
     }
 
-    const websocketUrl = Config.get('app.urls.websocket');
+    const websocketUrl: string = Config.get('app.urls.websocket');
     const sessionToken: string = token || this.flux.getState('user.session.token');
 
     if(sessionToken) {
@@ -60,10 +60,10 @@ export class Websocket {
 
       this.ws = new Sockette(url, {
         maxAttempts: 5,
-        onclose: this.onClose,
-        onerror: this.onError,
-        onmessage: this.onRecieve,
-        onopen: this.onOpen,
+        onclose: this.onClose.bind(this),
+        onerror: this.onError.bind(this),
+        onmessage: this.onReceive.bind(this),
+        onopen: this.onOpen.bind(this),
         timeout: 60000
       });
 

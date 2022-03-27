@@ -1,4 +1,4 @@
-import {FluxFramework} from '@nlabs/arkhamjs/lib';
+import {FluxFramework} from '@nlabs/arkhamjs';
 import {ApiError, graphqlQuery, HunterOptionsType, HunterQueryType, post} from '@nlabs/rip-hunter';
 import camelCase from 'lodash/camelCase';
 import isEmpty from 'lodash/isEmpty';
@@ -115,9 +115,9 @@ export const createQuery = (
   const queryVariables = variables || {};
   const variableKeys = Object.keys(queryVariables);
   const queryName = name.replace(/ /g, '');
-  const query = `${type} ${startCase(camelCase(queryName))}${
-    variableKeys.length ? `(${variableKeys.map((key) => `$${key}: ${queryVariables[key].type}`).join(', ')})` : ''
-  } {
+  const query = `${type} ${startCase(camelCase(queryName))}${variableKeys.length
+    ? `(${variableKeys.map((key) => `$${key}: ${queryVariables[key].type}`).join(', ')})`
+    : ''} {
     ${camelCase(queryName)}(${variableKeys.length ? `(${variableKeys.map((key) => `${key}: ${key}`).join(', ')})` : ''}
     ${returnProperties?.length ? `{${returnProperties.join(', ')}}` : ''}
   }`;
@@ -172,15 +172,14 @@ export const publicMutation = (
   return getGraphql(flux, publicUrl, false, query, options);
 };
 
-export const uploadImage = (image, options: HunterOptionsType = {}): Promise<any> => {
-  const {flux} = Config;
+export const uploadImage = (flux: FluxFramework, image, options: HunterOptionsType = {}): Promise<any> => {
   const token = flux.getState('user.session.token');
   const headers = new Headers();
   headers.set('Authorization', `Bearer ${token}`);
   return post(uploadImageUrl, image, {headers, ...options});
 };
 
-export const refreshSession = async (flux: FluxFramework,token: string, expires: number = 15): Promise<any> => {
+export const refreshSession = async (flux: FluxFramework, token: string, expires: number = 15): Promise<any> => {
   if(isEmpty(token)) {
     return null;
   }

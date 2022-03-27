@@ -1,29 +1,5 @@
 {
   "extends": [
     "styleguidejs/typescript"
-  ],
-  "rules": {
-    "@typescript-eslint/no-use-before-define": 0,
-    "import/extensions": [
-      "error",
-      "never",
-      {
-        "css": "always",
-        "json": "always",
-        "svg": "always",
-        "types": "always"
-      }
-    ],
-    "import/no-extraneous-dependencies": [
-      "error",
-      {
-        "devDependencies": [
-          "**/*.test.ts",
-          "**/*.test.tsx",
-          "**/testUtils.tsx"
-        ]
-      }
-    ],
-    "no-plusplus": 0
-  }
+  ]
 }

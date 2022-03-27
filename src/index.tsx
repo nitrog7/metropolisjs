@@ -6,7 +6,7 @@ import {ArkhamConstants, FluxFramework} from '@nlabs/arkhamjs';
 import {useFlux, useFluxListener} from '@nlabs/arkhamjs-utils-react';
 import React, {useCallback, useEffect, useState} from 'react';
 
-import {Websocket} from './actions/Websocket';
+import {Websockets} from './actions/Websockets';
 import {Config, ConfigAppType, MetropolisConfiguration} from './config';
 import {SIGNOUT, UPDATE_MESSAGES, UPDATE_NOTIFICATIONS, UPDATE_SESSION} from './constants/MetropolisConstants';
 import {MessageSubscription} from './graphql/message';
@@ -23,15 +23,15 @@ import {
   userStore,
   websocketStore
 } from './stores';
-import {refreshSession} from './utils';
-import {MetropolisContext} from './utils/MetropolisProvider';
+import {refreshSession} from './utils/api';
+import {MetropolisAdapters, MetropolisContext} from './utils/MetropolisProvider';
 
 export {MetropolisConfiguration} from './config';
 export * from './adapters';
 export * from './stores';
-export {useMetropolis} from './utils';
+export {useMetropolis} from './utils/useMetropolis';
 
-export const onInit = async (flux: FluxFramework, wsInit: any) => {
+export const onInit = async (flux: FluxFramework) => {
   try {
     flux.addStores([
       appStore,
@@ -47,30 +47,32 @@ export const onInit = async (flux: FluxFramework, wsInit: any) => {
     const token = flux.getState('user.session.token');
     console.log({token});
     await refreshSession(flux, token);
-    wsInit();
+    // wsInit();
   } catch(error) {
     throw error;
   }
 };
 
+export * from './utils/api';
 export interface MetropolisProps {
+  readonly adapters?: MetropolisAdapters;
   readonly children?: React.ReactElement | React.ReactElement[];
   readonly config?: MetropolisConfiguration;
 }
 
-export const Metropolis = ({children, config = {}}: MetropolisProps): React.ReactElement => {
+export const Metropolis = ({adapters, children, config = {}}: MetropolisProps): React.ReactElement => {
+  Config.setConfig(config);
+
   const flux = useFlux();
-  const {wsInit} = new Websocket(flux);
+  const websockets = new Websockets(flux);
 
   // Initial state
   const [messages, setMessages] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [session, setSession] = useState({});
 
-  console.log({config, flux});
   // Save config to app
   // const {isAuth: configAuth} = config;
-  Config.setConfig(config);
 
   // const onUpdateMessages = useCallback(() => {
   //   const cachedSession = Flux.getState('user.session', {});
@@ -111,7 +113,8 @@ export const Metropolis = ({children, config = {}}: MetropolisProps): React.Reac
 
   useEffect(() => {
     // Initialize
-    onInit(flux, wsInit);
+    onInit(flux);
+    websockets.wsInit();
 
     // const messageSubscription = API.graphql(graphqlOperation(MessageSubscription))
     //   // @ts-ignore
@@ -151,15 +154,16 @@ export const Metropolis = ({children, config = {}}: MetropolisProps): React.Reac
   return (
     <MetropolisContext.Provider
       value={{
+        adapters,
         isAuth: () => true,
         messages,
         notifications,
         session,
-        updateMessage: () => {},
-        updateNotification: () => {}
+        updateMessage: () => { },
+        updateNotification: () => { }
       }}>
       {children}
-    </MetropolisContext.Provider>
+    </MetropolisContext.Provider >
   );
 };
 

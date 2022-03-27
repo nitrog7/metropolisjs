@@ -18,9 +18,11 @@ import {
 import {ApiResultsType, appMutation, appQuery} from '../utils/api';
 
 export class Reactions {
+  CustomAdapter: any;
   flux: FluxFramework;
 
-  constructor(flux: FluxFramework) {
+  constructor(flux: FluxFramework, CustomAdapter: any = Reaction) {
+    this.CustomAdapter = CustomAdapter;
     this.flux = flux;
   }
 

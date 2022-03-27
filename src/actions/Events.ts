@@ -21,13 +21,15 @@ import {
 import {ApiResultsType, appMutation, appQuery} from '../utils/api';
 
 export class Events {
+  CustomAdapter: any;
   flux: FluxFramework;
 
-  constructor(flux: FluxFramework) {
+  constructor(flux: FluxFramework, CustomAdapter: any = Event) {
+    this.CustomAdapter = CustomAdapter;
     this.flux = flux;
   }
 
-  async addEvent(eventData: any, eventProps: string[] = [], CustomClass: any = Event): Promise<any> {
+  async addEvent(eventData: any, eventProps: string[] = [],): Promise<any> {
     try {
       const event = new Event(eventData);
 
@@ -40,7 +42,7 @@ export class Events {
 
       const onSuccess = (data: ApiResultsType = {}) => {
         const {addEvent = {}} = data;
-        return this.flux.dispatch({event: new CustomClass(addEvent), type: EVENT_ADD_SUCCESS});
+        return this.flux.dispatch({event: new this.CustomAdapter(addEvent), type: EVENT_ADD_SUCCESS});
       };
 
       return await appMutation(this.flux, 'addEvent', queryVariables, ['eventId', ...eventProps], {onSuccess});
