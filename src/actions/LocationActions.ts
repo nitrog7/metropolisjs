@@ -2,32 +2,32 @@
  * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import {FluxFramework} from '@nlabs/arkhamjs';
 import {get as httpGet} from '@nlabs/rip-hunter';
 
 import {Location} from '../adapters/Location';
 import {Config} from '../config';
-import {
-  LOCATION_ADD_ERROR,
-  LOCATION_ADD_SUCCESS,
-  LOCATION_DELETE_ERROR,
-  LOCATION_DELETE_SUCCESS,
-  LOCATION_GET_DETAILS_ERROR,
-  LOCATION_GET_DETAILS_SUCCESS,
-  LOCATION_GET_LIST_ERROR,
-  LOCATION_GET_LIST_SUCCESS,
-  LOCATION_SET_CURRENT,
-  LOCATION_UPDATE_ERROR,
-  LOCATION_UPDATE_SUCCESS
-} from '../stores/locationStore';
-import {ApiResultsType, appMutation} from '../utils/api';
+import {LocationConstants} from '../stores/locationStore';
+import {appMutation} from '../utils/api';
 import {autoCompleteLocation} from '../utils/location';
 
-export class Locations {
-  CustomAdapter: any;
+import type {ApiResultsType, ReaktorDbCollection} from '../utils/api';
+import type {FluxFramework} from '@nlabs/arkhamjs';
+
+const DATA_TYPE: ReaktorDbCollection = 'locations';
+
+export type LocationApiResultsType = {
+  addLocation: Location;
+  deleteLocation: Location;
+  getLocation: Location;
+  getLocationsByItem: Location[];
+  updateLocation: Location;
+};
+
+export class LocationActions {
+  CustomAdapter: typeof Location;
   flux: FluxFramework;
 
-  constructor(flux: FluxFramework, CustomAdapter: any = Location) {
+  constructor(flux: FluxFramework, CustomAdapter: typeof Location = Location) {
     this.CustomAdapter = CustomAdapter;
     this.flux = flux;
   }
@@ -37,12 +37,16 @@ export class Locations {
     latitude?: number,
     longitude?: number,
     locationProps: string[] = [],
-    CustomClass: any = Location
-  ) {
+    CustomClass: typeof Location = Location
+  ): Promise<Location[]> {
     return autoCompleteLocation(this.flux, address, latitude, longitude, locationProps, CustomClass);
   }
 
-  async addLocation(location: any, locationProps: string[] = [], CustomClass = Location): Promise<any> {
+  async add(
+    location: Partial<Location>,
+    locationProps: string[] = [],
+    CustomClass: typeof Location = Location
+  ): Promise<Location> {
     try {
       const queryVariables = {
         location: {
@@ -53,12 +57,13 @@ export class Locations {
 
       const onSuccess = (data: ApiResultsType = {}) => {
         const {addLocation = {}} = data;
-        return this.flux.dispatch({location: new CustomClass(addLocation), type: LOCATION_ADD_SUCCESS});
+        return this.flux.dispatch({location: new CustomClass(addLocation), type: LocationConstants.ADD_ITEM_SUCCESS});
       };
 
-      return await appMutation(
+      const {location: addedLocation} = await appMutation(
         this.flux,
         'addLocation',
+        DATA_TYPE,
         queryVariables,
         [
           'added',
@@ -76,12 +81,14 @@ export class Locations {
         ],
         {onSuccess}
       );
+      return addedLocation as Location;
     } catch(error) {
-      return this.flux.dispatch({error, type: LOCATION_ADD_ERROR});
+      this.flux.dispatch({error, type: LocationConstants.ADD_ITEM_ERROR});
+      throw error;
     }
   }
 
-  async deleteLocation(locationId: string): Promise<any> {
+  async delete(locationId: string): Promise<Location> {
     try {
       const queryVariables = {
         locationId: {
@@ -92,42 +99,47 @@ export class Locations {
 
       const onSuccess = (data: ApiResultsType = {}) => {
         const {deleteLocation: location = {}} = data;
-        return this.flux.dispatch({location: new Location(location), type: LOCATION_DELETE_SUCCESS});
+        return this.flux.dispatch({location: new Location(location), type: LocationConstants.REMOVE_ITEM_SUCCESS});
       };
 
-      return await appMutation(this.flux, 'deleteLocation', queryVariables, ['id'], {onSuccess});
+      const {location: deletedLocation} = await appMutation(
+        this.flux,
+        'deleteLocation',
+        DATA_TYPE,
+        queryVariables,
+        ['id'],
+        {onSuccess}
+      );
+      return deletedLocation as Location;
     } catch(error) {
-      return this.flux.dispatch({error, type: LOCATION_DELETE_ERROR});
+      this.flux.dispatch({error, type: LocationConstants.REMOVE_ITEM_ERROR});
+      throw error;
     }
   }
 
-  async getCurrentLocation(setLocation?: any): Promise<any> {
+  async getCurrentLocation(setLocation?: (location: Location) => void): Promise<Location> {
     return new Promise((resolve, reject) => {
       const {userId} = this.flux.getState('user.session', {});
       const {city, country, latitude, longitude, state} = this.flux.getState(['user', 'users', userId], {});
-      const location: string = [city, state, country].join(', ');
-      const profileLocation = {latitude, location, longitude};
+      const locationStr: string = [city, state, country].join(', ');
+      const profileLocation = new Location({
+        latitude,
+        location: locationStr,
+        longitude
+      });
 
       if(navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           async ({coords}) => {
-            const current = {
-              accuracy: coords.accuracy,
-              altitude: coords.altitude,
-              altitudeAccuracy: coords.altitudeAccuracy,
-              heading: coords.heading,
+            const current = new Location({
               latitude: coords.latitude,
               location: 'Current Location',
-              longitude: coords.longitude,
-              speed: coords.speed
-            };
-            console.log('getCurrentLocation::current', current);
-            await this.flux.dispatch({current, type: LOCATION_SET_CURRENT});
-
+              longitude: coords.longitude
+            });
+            await this.flux.dispatch({current, type: LocationConstants.SET_CURRENT});
             if(setLocation) {
               setLocation(current);
             }
-
             resolve(current);
           },
           (locationError) => {
@@ -137,7 +149,7 @@ export class Locations {
               setLocation(profileLocation);
             }
 
-            this.flux.dispatch({current: profileLocation, type: LOCATION_SET_CURRENT});
+            this.flux.dispatch({current: profileLocation, type: LocationConstants.SET_CURRENT});
             reject(locationError);
           },
           {enableHighAccuracy: false, maximumAge: 0, timeout: 30000}
@@ -148,19 +160,19 @@ export class Locations {
           setLocation(profileLocation);
         }
 
-        this.flux.dispatch({current: profileLocation, type: LOCATION_SET_CURRENT});
+        this.flux.dispatch({current: profileLocation, type: LocationConstants.SET_CURRENT});
         reject('Geolocation is not supported by this browser.');
       }
     });
   }
 
-  getGoogleLocation(address: string): Promise<any> {
-    const {key: googleKey, url: googleUrl} = Config.get('google.maps');
+  async getGoogleLocation(address: string): Promise<{latitude: number, location: string, longitude: number}> {
+    const {key: googleKey, url: googleUrl} = Config.get('google.maps') as {key: string, url: string};
     const formatAddress: string = encodeURI(address);
     const url: string = `${googleUrl}?address=${formatAddress}&key=${googleKey}`;
 
     if(url) {
-      return null;
+      return {latitude: 0, location: '', longitude: 0};
     }
     return httpGet(url).then((data) => {
       const {results} = data;
@@ -175,7 +187,11 @@ export class Locations {
     });
   }
 
-  async getLocation(location, locationProps: string[], CustomClass = Location): Promise<any> {
+  async getLocation(
+    location: Partial<Location>,
+    locationProps: string[],
+    CustomClass: typeof Location = Location
+  ): Promise<Location> {
     try {
       const queryVariables = {
         location: {
@@ -186,12 +202,13 @@ export class Locations {
 
       const onSuccess = (data: ApiResultsType = {}) => {
         const {location = {}} = data;
-        return this.flux.dispatch({location: new CustomClass(location), type: LOCATION_GET_DETAILS_SUCCESS});
+        return this.flux.dispatch({location: new CustomClass(location), type: LocationConstants.GET_ITEM_SUCCESS});
       };
 
-      return await appMutation(
+      const {location: locationResult} = await appMutation(
         this.flux,
         'location',
+        DATA_TYPE,
         queryVariables,
         [
           'added',
@@ -209,12 +226,18 @@ export class Locations {
         ],
         {onSuccess}
       );
+      return locationResult as Location;
     } catch(error) {
-      return this.flux.dispatch({error, type: LOCATION_GET_DETAILS_ERROR});
+      this.flux.dispatch({error, type: LocationConstants.GET_ITEM_ERROR});
+      throw error;
     }
   }
 
-  async getLocationsByItem(itemId: string, locationProps: string[], CustomClass = Location): Promise<any> {
+  async listByItem(
+    itemId: string,
+    locationProps: string[],
+    CustomClass: typeof Location = Location
+  ): Promise<Location[]> {
     try {
       const queryVariables = {
         itemId: {
@@ -224,16 +247,17 @@ export class Locations {
       };
 
       const onSuccess = (data: ApiResultsType = {}) => {
-        const {locationsByItem = []} = data;
+        const {locationsByItem = []} = data as {locationsByItem: Location[]};
         return this.flux.dispatch({
           list: locationsByItem.map((item) => new CustomClass(item)),
-          type: LOCATION_GET_LIST_SUCCESS
+          type: LocationConstants.GET_LIST_SUCCESS
         });
       };
 
-      return await appMutation(
+      const {locationsByItem: locationsList} = await appMutation(
         this.flux,
         'location',
+        DATA_TYPE,
         queryVariables,
         [
           'added',
@@ -251,12 +275,18 @@ export class Locations {
         ],
         {onSuccess}
       );
+      return locationsList as Location[];
     } catch(error) {
-      return this.flux.dispatch({error, type: LOCATION_GET_LIST_ERROR});
+      this.flux.dispatch({error, type: LocationConstants.GET_LIST_ERROR});
+      throw error;
     }
   }
 
-  async updateLocation(location: any, locationProps: string[], CustomClass = Location): Promise<any> {
+  async update(
+    location: Partial<Location>,
+    locationProps: string[],
+    CustomClass: typeof Location = Location
+  ): Promise<Location> {
     try {
       const queryVariables = {
         location: {
@@ -267,12 +297,13 @@ export class Locations {
 
       const onSuccess = (data: ApiResultsType = {}) => {
         const {updateLocation = {}} = data;
-        return this.flux.dispatch({location: new CustomClass(updateLocation), type: LOCATION_UPDATE_SUCCESS});
+        return this.flux.dispatch({location: new CustomClass(updateLocation), type: LocationConstants.UPDATE_ITEM_SUCCESS});
       };
 
-      return await appMutation(
+      const {location: updatedLocation} = await appMutation(
         this.flux,
         'updateLocation',
+        DATA_TYPE,
         queryVariables,
         [
           'added',
@@ -290,8 +321,10 @@ export class Locations {
         ],
         {onSuccess}
       );
+      return updatedLocation as Location;
     } catch(error) {
-      return this.flux.dispatch({error, type: LOCATION_UPDATE_ERROR});
+      this.flux.dispatch({error, type: LocationConstants.UPDATE_ITEM_ERROR});
+      throw error;
     }
   }
 }

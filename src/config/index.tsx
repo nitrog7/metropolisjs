@@ -16,7 +16,14 @@ export interface ConfigAppUrls {
   readonly websocket?: string;
 }
 
+export interface ConfigAppApiType {
+  readonly public?: string;
+  readonly url?: string;
+  readonly uploadImage?: string;
+}
+
 export interface ConfigAppType {
+  readonly api?: ConfigAppApiType;
   readonly name?: string;
   readonly session?: ConfigAppSessionType;
   readonly urls?: ConfigAppUrls;
@@ -25,26 +32,27 @@ export interface ConfigAppType {
 
 export interface MetropolisConfiguration {
   readonly adapters?: MetropolisAdapters;
-  readonly appConfig?: Partial<ConfigAppType>;
+  readonly app?: Partial<ConfigAppType>;
+  readonly environment?: string;
   readonly isAuth?: () => boolean;
 }
 
 export class Config {
-  static values: any = {};
+  static values: Record<string, unknown> = {};
 
-  static setConfig(values: object): any {
+  static setConfig(values: MetropolisConfiguration): MetropolisConfiguration {
     this.values = merge(this.values, values);
     return this.values;
   }
 
-  static get(path?: string | string[], defaultValue?: any): any {
+  static get<T = unknown>(path?: string | string[], defaultValue?: T): T {
     const environment: string = process.env.NODE_ENV || 'development';
-    const configValues: object = {...this.values, environment};
+    const configValues: MetropolisConfiguration = {...this.values, environment};
 
     if(!path) {
-      return configValues;
+      return configValues as T;
     }
 
-    return get(configValues, path, defaultValue);
+    return get(configValues, path, defaultValue) as T;
   }
 }

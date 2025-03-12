@@ -3,7 +3,6 @@
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
 import {
-  parseArangoId,
   parseBoolean,
   parseChar,
   parseEmail,
@@ -20,17 +19,61 @@ import isNil from 'lodash/isNil';
 import isString from 'lodash/isString';
 import {DateTime} from 'luxon';
 
-import {parseDateTime} from '../utils/dateUtils';
 import {Adapter} from './Adapter';
 import {Tag} from './Tag';
+import {parseDateTime} from '../utils/dateUtils';
+
+import type {Image} from './Image';
+
+export interface UserData {
+  readonly active: boolean;
+  readonly added: number;
+  readonly address: string;
+  readonly city: string;
+  readonly country: string;
+  readonly dob: number;
+  readonly dobDay: number;
+  readonly dobMonth: number;
+  readonly dobYear: number;
+  readonly email: string;
+  readonly expires: number;
+  readonly gender: string;
+  readonly hasLike: boolean;
+  readonly hasView: boolean;
+  readonly id: string;
+  readonly images: Image[];
+  readonly imageCount: number;
+  readonly imageId: string;
+  readonly imageUrl: string;
+  readonly issued: number;
+  readonly latitude: number;
+  readonly likeCount: number;
+  readonly longitude: number;
+  readonly modified: number;
+  readonly password: string;
+  readonly phone: string;
+  readonly state: string;
+  readonly street: string;
+  readonly tags: Tag[];
+  readonly thumbUrl: string;
+  readonly timestamp: number;
+  readonly token: string;
+  readonly userAccess: number;
+  readonly userId: string;
+  readonly username: string;
+  readonly viewCount: number;
+  readonly zip: string;
+}
 
 export class User extends Adapter {
+  static TYPE = 'users';
+  static TYPE_ID = 'userId';
+
   active: boolean;
-  added: number;
   address: string;
-  birthday: number;
   city: string;
   country: string;
+  dob: number;
   dobDay: number;
   dobMonth: number;
   dobYear: number;
@@ -39,8 +82,7 @@ export class User extends Adapter {
   gender: string;
   hasLike: boolean;
   hasView: boolean;
-  id: string;
-  images: any[];
+  images: Image[];
   imageCount: number;
   imageId: string;
   imageUrl: string;
@@ -48,16 +90,13 @@ export class User extends Adapter {
   latitude: number;
   likeCount: number;
   longitude: number;
-  mailingList: boolean;
-  modified: number;
   password: string;
   phone: string;
-  photoCount: number;
   state: string;
   street: string;
   tags: Tag[];
-  timestamp: number;
   thumbUrl: string;
+  timestamp: number;
   token: string;
   userAccess: number;
   userId: string;
@@ -65,20 +104,23 @@ export class User extends Adapter {
   viewCount: number;
   zip: string;
 
-  constructor(data: Partial<User>) {
-    super();
+  constructor(data: Partial<UserData>) {
+    super(data);
 
     const {
       active,
-      added,
       address,
       city,
       country,
+      dob,
+      dobDay,
+      dobMonth,
+      dobYear,
       email,
       expires,
+      gender,
       hasLike,
       hasView,
-      id,
       images,
       imageCount,
       imageId,
@@ -87,32 +129,21 @@ export class User extends Adapter {
       latitude,
       likeCount,
       longitude,
-      modified,
       password,
       phone,
-      photoCount,
       state,
       street,
       tags,
       thumbUrl,
       timestamp,
       token,
-      username,
       userAccess,
-      userId,
+      username,
       viewCount,
       zip
     } = data;
 
     // Account
-    if(!isNil(id)) {
-      this.id = parseArangoId(id);
-    } else if(!isNil(userId)) {
-      this.id = `users/${parseId(userId)}`;
-    }
-    if(!isNil(userId)) {
-      this.userId = parseId(userId);
-    }
     if(!isNil(email)) {
       this.email = parseEmail(email);
     }
@@ -153,9 +184,6 @@ export class User extends Adapter {
     if(!isNil(likeCount)) {
       this.likeCount = parseNum(likeCount);
     }
-    if(!isNil(photoCount)) {
-      this.photoCount = parseNum(photoCount);
-    }
     if(!isNil(viewCount)) {
       this.viewCount = parseNum(viewCount);
     }
@@ -163,14 +191,6 @@ export class User extends Adapter {
     // Active status
     if(!isNil(active)) {
       this.active = parseBoolean(active);
-    }
-
-    // Timestamp
-    if(!isNil(added)) {
-      this.added = parseDateTime(added);
-    }
-    if(!isNil(modified)) {
-      this.modified = parseDateTime(modified);
     }
 
     // Location
@@ -216,8 +236,7 @@ export class User extends Adapter {
       this.thumbUrl = thumbUrl;
     }
 
-    // Birthday
-    const {dobDay, dobMonth, dobYear} = data;
+    // Profile
     if(!isNil(dobMonth) && !isNil(dobDay) && !isNil(dobYear)) {
       const dobDate: DateTime = DateTime.local().set({
         day: dobDay,
@@ -231,28 +250,16 @@ export class User extends Adapter {
       const diffInDays: number = dobDate.diff(DateTime.local(), ['days']).days;
 
       if(diffInDays < 0) {
-        this.birthday = dobDate.toMillis();
+        this.dob = dobDate.toMillis();
       }
     }
-
-    // Email
-    if(isString(data.email)) {
-      this.email = parseEmail(data.email);
+    if(!isNil(dob)) {
+      this.dob = parseDateTime(dob);
     }
 
     // Gender
-    if(isString(data.gender)) {
+    if(isString(gender)) {
       this.gender = parseChar(data.gender, 1);
-    }
-
-    // Mailing list
-    if(!isNil(data.mailingList)) {
-      this.mailingList = parseBoolean(data.mailingList);
-    }
-
-    // Phone number
-    if(isString(data.phone)) {
-      this.phone = parsePhone(data.phone);
     }
 
     // Tags
@@ -264,16 +271,14 @@ export class User extends Adapter {
   getInput(): Partial<User> {
     return this.getValues([
       'address',
-      'birthday',
       'city',
       'country',
+      'dob',
       'email',
       'gender',
-      'height',
       'imageId',
       'latitude',
       'longitude',
-      'mailingList',
       'password',
       'phone',
       'state',

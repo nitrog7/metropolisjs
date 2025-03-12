@@ -4,26 +4,29 @@
  */
 import React, {createContext} from 'react';
 
+import type {Event, Image, Location, Message, Post, Reaction, Tag, User} from '../adapters';
+import type {SessionType} from './api';
+
 export interface MetropolisAdapters {
-  readonly Event?: any;
-  readonly Image?: any;
-  readonly Location?: any;
-  readonly Message?: any;
-  readonly Post?: any;
-  readonly Reaction?: any;
-  readonly Tag?: any;
-  readonly User?: any;
+  readonly Event?: typeof Event;
+  readonly Image?: typeof Image;
+  readonly Location?: typeof Location;
+  readonly Message?: typeof Message;
+  readonly Post?: typeof Post;
+  readonly Reaction?: typeof Reaction;
+  readonly Tag?: typeof Tag;
+  readonly User?: typeof User;
 }
 
 export interface MetropolisProviderProps {
-  readonly children?: any;
+  readonly children?: React.ReactElement | React.ReactElement[];
   readonly adapters?: MetropolisAdapters;
   readonly isAuth?: () => boolean;
-  readonly messages?: any[];
-  readonly notifications?: any[];
-  readonly session?: any;
-  readonly updateMessage: (message: any) => any;
-  readonly updateNotification: (notification: any) => any;
+  readonly messages?: Message[];
+  readonly notifications?: Notification[];
+  readonly session?: SessionType;
+  readonly updateMessage: (message: Message) => void;
+  readonly updateNotification: (notification: Notification) => void;
 }
 
 const isAuth = () => true;

@@ -2,46 +2,38 @@
  * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import {parseArangoId, parseId, parseString} from '@nlabs/utils/lib';
-import isNil from 'lodash/isNil';
+import {parseId, parseString} from '@nlabs/utils/lib';
 import isString from 'lodash/isString';
-import isUndefined from 'lodash/isUndefined';
 
-import {parseDateTime} from '../utils/dateUtils';
 import {Adapter} from './Adapter';
 import {User} from './User';
 
+export interface MessageData {
+  readonly _id?: string;
+  readonly _key?: string;
+  readonly added?: number | string;
+  readonly content?: string;
+  readonly conversationId?: string;
+  readonly id?: string;
+  readonly modified?: number | string;
+  readonly messageId?: string;
+  readonly user?: Record<string, unknown>;
+}
+
 export class Message extends Adapter {
-  added: number;
+  static TYPE = 'messages';
+  static TYPE_ID = 'messageId';
+
   content: string;
   conversationId: string;
-  id: string;
-  modified: number;
   messageId: string;
   position: string = 'left';
   user: User;
 
-  constructor(data: any, sessionId: string) {
-    super();
+  constructor(data: Partial<MessageData>, sessionId: string) {
+    super(data);
 
-    const {_id, _key, added, content, conversationId, id, modified, messageId, user} = data;
-
-    // ID
-    if(!isNil(_id) || !isNil(id)) {
-      this.id = parseArangoId(_id || id);
-    } else if(!isNil(messageId)) {
-      this.id = `posts/${parseId(messageId)}`;
-    }
-    if(!isNil(_key) || !isNil(messageId)) {
-      this.messageId = _key || messageId;
-    }
-
-    if(!isUndefined(added)) {
-      this.added = parseDateTime(added);
-    }
-    if(!isUndefined(modified)) {
-      this.modified = parseDateTime(modified);
-    }
+    const {content, conversationId, messageId, user} = data;
 
     if(isString(content)) {
       this.content = parseString(content);

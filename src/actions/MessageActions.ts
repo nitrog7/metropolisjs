@@ -2,29 +2,34 @@
  * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import {FluxFramework} from '@nlabs/arkhamjs';
 
 import {Message} from '../adapters/Message';
-import {
-  MESSAGE_ADD_ERROR,
-  MESSAGE_ADD_SUCCESS,
-  MESSAGE_GET_CONVO_LIST_ERROR,
-  MESSAGE_GET_CONVO_LIST_SUCCESS,
-  MESSAGE_GET_LIST_ERROR,
-  MESSAGE_GET_LIST_SUCCESS
-} from '../stores/messageStore';
-import {ApiResultsType, appMutation, appQuery} from '../utils/api';
+import {MessageConstants} from '../stores/messageStore';
+import {appMutation, appQuery} from '../utils/api';
 
-export class Messages {
-  CustomAdapter: any;
+import type {Conversation} from '../adapters';
+import type {ApiResultsType, ReaktorDbCollection} from '../utils/api';
+import type{FluxFramework} from '@nlabs/arkhamjs';
+
+const DATA_TYPE: ReaktorDbCollection = 'messages';
+
+export type MessageApiResultsType = {
+  sendMessage: Message;
+  getDirectConversation: Conversation;
+  getMessages: Message[];
+  getConversations: Conversation[];
+};
+
+export class MessageActions {
+  CustomAdapter: typeof Message;
   flux: FluxFramework;
 
-  constructor(flux: FluxFramework, CustomAdapter: any = Message) {
+  constructor(flux: FluxFramework, CustomAdapter: typeof Message = Message) {
     this.CustomAdapter = CustomAdapter;
     this.flux = flux;
   }
 
-  async sendMessage(message: Partial<Message>, messageProps: string[] = [], CustomClass = Message) {
+  async sendMessage(message: Partial<Message>, messageProps: string[] = [], CustomClass = Message): Promise<Message> {
     try {
       const queryVariables = {
         message: {
@@ -36,22 +41,25 @@ export class Messages {
       const onSuccess = (data: ApiResultsType = {}) => {
         const {sendMessage: message = {}} = data;
         const sessionId: string = this.flux.getState('user.session.userId', '');
-        return this.flux.dispatch({message: new CustomClass(message, sessionId), type: MESSAGE_ADD_SUCCESS});
+        return this.flux.dispatch({message: new CustomClass(message, sessionId), type: MessageConstants.ADD_ITEM_SUCCESS});
       };
 
-      return await appMutation(
+      const {message: addedMessage} = await appMutation(
         this.flux,
         'sendMessage',
+        DATA_TYPE,
         queryVariables,
         ['added', 'content', 'modified', 'messageId', 'user { userId, username }', ...messageProps],
         {onSuccess}
       );
+      return addedMessage as Message;
     } catch(error) {
-      return this.flux.dispatch({error, type: MESSAGE_ADD_ERROR});
+      this.flux.dispatch({error, type: MessageConstants.ADD_ITEM_ERROR});
+      throw error;
     }
   }
 
-  getDirectConversation(userId: string) {
+  async getDirectConversation(userId: string): Promise<Conversation> {
     try {
       const queryVariables = {
         userId: {
@@ -62,22 +70,25 @@ export class Messages {
 
       const onSuccess = (data: ApiResultsType = {}) => {
         const {directConversation: conversation = {}} = data;
-        return this.flux.dispatch({conversation, type: MESSAGE_GET_CONVO_LIST_SUCCESS});
+        return this.flux.dispatch({conversation, type: MessageConstants.GET_CONVO_LIST_SUCCESS});
       };
 
-      return appQuery(
+      const {directConversation: conversation} = await appQuery(
         this.flux,
         'directConversation',
+        DATA_TYPE,
         queryVariables,
         ['added', 'conversationId', 'modified', 'name', 'users { userId, username }'],
         {onSuccess}
       );
+      return conversation as Conversation;
     } catch(error) {
-      return this.flux.dispatch({error, type: MESSAGE_GET_CONVO_LIST_ERROR});
+      this.flux.dispatch({error, type: MessageConstants.GET_CONVO_LIST_ERROR});
+      throw error;
     }
   }
 
-  getMessages(conversationId: string, messageProps: string[] = [], CustomClass = Message): Promise<any> {
+  async getMessages(conversationId: string, messageProps: string[] = [], CustomClass = Message): Promise<Message[]> {
     try {
       const queryVariables = {
         conversationId: {
@@ -87,29 +98,32 @@ export class Messages {
       };
 
       const onSuccess = (data: ApiResultsType = {}) => {
-        const {messages = []} = data;
+        const {messages = []} = data as {messages: Message[]};
         const sessionId: string = this.flux.getState('user.session.userId', '');
 
         return this.flux.dispatch({
           conversationId,
           list: messages.map((messageData) => new CustomClass(messageData, sessionId)),
-          type: MESSAGE_GET_LIST_SUCCESS
+          type: MessageConstants.GET_LIST_SUCCESS
         });
       };
 
-      return appQuery(
+      const {messages: messagesList} = await appQuery(
         this.flux,
         'messages',
+        DATA_TYPE,
         queryVariables,
         ['added', 'content', 'modified', 'messageId', 'user { userId, username }', ...messageProps],
         {onSuccess}
       );
+      return messagesList as Message[];
     } catch(error) {
-      return this.flux.dispatch({error, type: MESSAGE_GET_LIST_ERROR});
+      this.flux.dispatch({error, type: MessageConstants.GET_LIST_ERROR});
+      throw error;
     }
   }
 
-  async getConversations(from: number = 0, to: number = 10): Promise<any> {
+  async getConversations(from: number = 0, to: number = 10): Promise<Conversation[]> {
     try {
       const queryVariables = {
         from: {
@@ -124,18 +138,21 @@ export class Messages {
 
       const onSuccess = (data: ApiResultsType = {}) => {
         const {conversations = []} = data;
-        return this.flux.dispatch({conversations, type: MESSAGE_GET_CONVO_LIST_SUCCESS});
+        return this.flux.dispatch({conversations, type: MessageConstants.GET_CONVO_LIST_SUCCESS});
       };
 
-      return await appQuery(
+      const {conversations: conversationsList} = await appQuery(
         this.flux,
         'conversations',
+        DATA_TYPE,
         queryVariables,
         ['added', 'content', 'conversationId', 'modified', 'name', 'thumbUrl', 'users { userId, username }'],
         {onSuccess}
       );
+      return conversationsList as Conversation[];
     } catch(error) {
-      return this.flux.dispatch({error, type: MESSAGE_GET_CONVO_LIST_ERROR});
+      this.flux.dispatch({error, type: MessageConstants.GET_CONVO_LIST_ERROR});
+      throw error;
     }
   }
 }

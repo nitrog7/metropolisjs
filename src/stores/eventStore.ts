@@ -2,24 +2,35 @@
  * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-export const EVENT_ADD_ERROR: string = 'EVENT_ADD_ERROR';
-export const EVENT_ADD_SUCCESS: string = 'EVENT_ADD_SUCCESS';
-export const EVENT_GET_ERROR: string = 'EVENT_GET_ERROR';
-export const EVENT_GET_SUCCESS: string = 'EVENT_GET_SUCCESS';
-export const EVENT_GET_LIST_ERROR: string = 'EVENT_GET_LIST_ERROR';
-export const EVENT_GET_LIST_SUCCESS: string = 'EVENT_GET_LIST_SUCCESS';
-export const EVENT_REMOVE_ERROR: string = 'EVENT_REMOVE_ERROR';
-export const EVENT_REMOVE_SUCCESS: string = 'EVENT_REMOVE_SUCCESS';
-export const EVENT_UPDATE_ERROR: string = 'EVENT_UPDATE_ERROR';
-export const EVENT_UPDATE_SUCCESS: string = 'EVENT_UPDATE_SUCCESS';
+import type {Event} from '../adapters';
 
-const defaultValues: any = {
+export class EventConstants {
+  static readonly ADD_ITEM_ERROR: string = 'EVENT_ADD_ITEM_ERROR';
+  static readonly ADD_ITEM_SUCCESS: string = 'EVENT_ADD_ITEM_SUCCESS';
+  static readonly GET_ITEM_ERROR: string = 'EVENT_GET_ITEM_ERROR';
+  static readonly GET_ITEM_SUCCESS: string = 'EVENT_GET_ITEM_SUCCESS';
+  static readonly GET_LIST_ERROR: string = 'EVENT_GET_LIST_ERROR';
+  static readonly GET_LIST_SUCCESS: string = 'EVENT_GET_LIST_SUCCESS';
+  static readonly REMOVE_ITEM_ERROR: string = 'EVENT_REMOVE_ITEM_ERROR';
+  static readonly REMOVE_ITEM_SUCCESS: string = 'EVENT_REMOVE_ITEM_SUCCESS';
+  static readonly UPDATE_ITEM_ERROR: string = 'EVENT_UPDATE_ITEM_ERROR';
+  static readonly UPDATE_ITEM_SUCCESS: string = 'EVENT_UPDATE_ITEM_SUCCESS';
+}
+
+interface EventState {
+  lists: Record<string, Record<string, unknown>[]>;
+}
+
+export const defaultValues: EventState = {
   lists: {}
 };
 
-export const eventStore = (type: string, data, state = defaultValues): any => {
+export const eventStore = (type: string, data: {
+  list?: Event[];
+  type?: string;
+}, state = defaultValues): EventState => {
   switch(type) {
-    case EVENT_GET_LIST_SUCCESS: {
+    case EventConstants.GET_LIST_SUCCESS: {
       const {list, type = 'default'} = data;
       const {lists} = state;
 

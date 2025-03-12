@@ -2,32 +2,61 @@
  * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import {parseArangoId, parseBoolean, parseId, parseNum, parseString} from '@nlabs/utils';
+import {parseBoolean, parseId, parseNum, parseString} from '@nlabs/utils';
 import isArray from 'lodash/isArray';
 import isNil from 'lodash/isNil';
 import isUndefined from 'lodash/isUndefined';
 
-import {User} from '../adapters/User';
-import {parseDateTime} from '../utils/dateUtils';
 import {Adapter} from './Adapter';
 import {Image} from './Image';
 import {Tag} from './Tag';
+import {User} from '../adapters/User';
+import {parseDateTime} from '../utils/dateUtils';
+
+export interface EventData {
+  readonly _id?: string;
+  readonly _key?: string;
+  readonly added?: number | string;
+  readonly address?: string;
+  readonly cached?: number;
+  readonly content?: string;
+  readonly endDate?: number | string;
+  readonly eventId?: string;
+  readonly groupId?: string;
+  readonly id?: string;
+  readonly images?: Record<string, unknown>[];
+  readonly isGoing?: boolean;
+  readonly latitude?: number;
+  readonly location?: string | {address: string; latitude: number; longitude: number};
+  readonly longitude?: number;
+  readonly mentions?: User[];
+  readonly modified?: number | string;
+  readonly name?: string;
+  readonly postId?: string;
+  readonly reactions?: string[];
+  readonly rsvpCount?: number;
+  readonly startDate?: number | string;
+  readonly tags?: Record<string, unknown>[];
+  readonly type?: string;
+  readonly user?: User;
+  readonly viewCount?: number;
+}
 
 export class Event extends Adapter {
-  added?: number;
+  static TYPE = 'events';
+  static TYPE_ID = 'eventId';
+
   address?: string;
   cached?: number;
   content: string;
   endDate?: number;
   eventId: string;
   groupId?: string;
-  id: string;
   images: Image[];
   isGoing?: boolean;
   latitude?: number;
   longitude?: number;
   mentions?: User[];
-  modified?: number;
   name?: string;
   postId: string;
   reactions?: string[];
@@ -38,27 +67,21 @@ export class Event extends Adapter {
   user?: User;
   viewCount?: number = 0;
 
-  constructor(data: any) {
-    super();
+  constructor(data: Partial<EventData>) {
+    super(data);
 
     const {
-      _id,
-      _key,
-      added,
       address,
       cached,
       content,
       endDate,
-      eventId,
       groupId,
-      id,
       images,
       isGoing,
       latitude,
       location,
       longitude,
       mentions,
-      modified,
       name,
       postId,
       reactions,
@@ -69,24 +92,6 @@ export class Event extends Adapter {
       user,
       viewCount
     } = data;
-
-    // ID
-    if(!isNil(_id) || !isNil(id)) {
-      this.id = parseArangoId(_id || id);
-    } else if(!isNil(eventId)) {
-      this.id = `posts/${parseId(eventId)}`;
-    }
-    if(!isNil(_key) || !isNil(eventId)) {
-      this.eventId = _key || eventId;
-      this.postId = this.eventId;
-    }
-
-    if(!isUndefined(added)) {
-      this.added = parseDateTime(added);
-    }
-    if(!isUndefined(modified)) {
-      this.modified = parseDateTime(modified);
-    }
 
     if(!isNil(cached)) {
       this.cached = parseNum(cached);

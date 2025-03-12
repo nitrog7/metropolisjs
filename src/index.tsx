@@ -2,16 +2,11 @@
  * Copyright (c) 2021-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import {ArkhamConstants, FluxFramework} from '@nlabs/arkhamjs';
-import {useFlux, useFluxListener} from '@nlabs/arkhamjs-utils-react';
-import React, {useCallback, useEffect, useState} from 'react';
+import {useFlux} from '@nlabs/arkhamjs-utils-react';
+import React, {useEffect, useState} from 'react';
 
-import {Websockets} from './actions/Websockets';
-import {Config, ConfigAppType, MetropolisConfiguration} from './config';
-import {SIGNOUT, UPDATE_MESSAGES, UPDATE_NOTIFICATIONS, UPDATE_SESSION} from './constants/MetropolisConstants';
-import {MessageSubscription} from './graphql/message';
-import {NotificationSubscription} from './graphql/notification';
-import {SessionSubscription} from './graphql/session';
+import {WebsocketActions} from './actions/WebsocketActions';
+import {Config, MetropolisConfiguration} from './config';
 import {
   appStore,
   eventStore,
@@ -26,12 +21,16 @@ import {
 import {refreshSession} from './utils/api';
 import {MetropolisAdapters, MetropolisContext} from './utils/MetropolisProvider';
 
+import type {FluxFramework} from '@nlabs/arkhamjs';
+import type {ReactElement} from 'react';
+
 export {MetropolisConfiguration} from './config';
 export * from './adapters';
+export * from './actions';
 export * from './stores';
 export {useMetropolis} from './utils/useMetropolis';
 
-export const onInit = async (flux: FluxFramework) => {
+export const onInit = (flux: FluxFramework) => {
   try {
     flux.addStores([
       appStore,
@@ -46,7 +45,10 @@ export const onInit = async (flux: FluxFramework) => {
     ]);
     const token = flux.getState('user.session.token');
     console.log({token});
-    await refreshSession(flux, token);
+
+    if(token) {
+      refreshSession(flux, token);
+    }
     // wsInit();
   } catch(error) {
     throw error;
@@ -60,13 +62,11 @@ export interface MetropolisProps {
   readonly config?: MetropolisConfiguration;
 }
 
-export const Metropolis = ({adapters, children, config = {}}: MetropolisProps): React.ReactElement => {
+export const Metropolis = ({adapters, children, config = {}}: MetropolisProps): ReactElement => {
   Config.setConfig(config);
-
+  console.log('Metropolis::init', {config});
   const flux = useFlux();
-  const websockets = new Websockets(flux);
-
-  // Initial state
+  const websockets = new WebsocketActions(flux);
   const [messages, setMessages] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [session, setSession] = useState({});

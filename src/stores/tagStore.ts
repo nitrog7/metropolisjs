@@ -4,28 +4,37 @@
  */
 import {DateTime} from 'luxon';
 
-export const TAG_ADD_ERROR: string = 'TAG_ADD_ERROR';
-export const TAG_ADD_SUCCESS: string = 'TAG_ADD_SUCCESS';
-export const TAG_ADD_PROFILE_ERROR: string = 'TAG_ADD_PROFILE_ERROR';
-export const TAG_ADD_PROFILE_SUCCESS: string = 'TAG_ADD_PROFILE_SUCCESS';
-export const TAG_DELETE_ERROR: string = 'TAG_DELETE_ERROR';
-export const TAG_DELETE_SUCCESS: string = 'TAG_DELETE_SUCCESS';
-export const TAG_DELETE_PROFILE_ERROR: string = 'TAG_DELETE_PROFILE_ERROR';
-export const TAG_DELETE_PROFILE_SUCCESS: string = 'TAG_DELETE_PROFILE_SUCCESS';
-export const TAG_GET_LIST_ERROR: string = 'TAG_GET_LIST_ERROR';
-export const TAG_GET_LIST_SUCCESS: string = 'TAG_GET_LIST_SUCCESS';
-export const TAG_UPDATE_ERROR: string = 'TAG_UPDATE_ERROR';
-export const TAG_UPDATE_SUCCESS: string = 'TAG_UPDATE_SUCCESS';
+import type {Tag} from '../adapters';
 
-const defaultValues: any = {
+export class TagConstants {
+  static readonly ADD_ITEM_ERROR: string = 'TAG_ADD_ITEM_ERROR';
+  static readonly ADD_ITEM_SUCCESS: string = 'TAG_ADD_ITEM_SUCCESS';
+  static readonly ADD_PROFILE_ERROR: string = 'TAG_ADD_PROFILE_ERROR';
+  static readonly ADD_PROFILE_SUCCESS: string = 'TAG_ADD_PROFILE_SUCCESS';
+  static readonly GET_LIST_ERROR: string = 'TAG_GET_LIST_ERROR';
+  static readonly GET_LIST_SUCCESS: string = 'TAG_GET_LIST_SUCCESS';
+  static readonly REMOVE_ITEM_ERROR: string = 'TAG_REMOVE_ITEM_ERROR';
+  static readonly REMOVE_ITEM_SUCCESS: string = 'TAG_REMOVE_ITEM_SUCCESS';
+  static readonly REMOVE_PROFILE_ERROR: string = 'TAG_REMOVE_PROFILE_ERROR';
+  static readonly REMOVE_PROFILE_SUCCESS: string = 'TAG_REMOVE_PROFILE_SUCCESS';
+  static readonly UPDATE_ITEM_ERROR: string = 'TAG_UPDATE_ITEM_ERROR';
+  static readonly UPDATE_ITEM_SUCCESS: string = 'TAG_UPDATE_ITEM_SUCCESS';
+}
+
+interface TagState {
+  expires: number;
+  list: Tag[];
+}
+
+export const defaultValues: TagState = {
   expires: Date.now(),
   list: []
 };
 
-export const tagStore = (type: string, data, state = defaultValues): any => {
+export const tagStore = (type: string, data: {tags?: TagState['list']}, state = defaultValues): TagState => {
   switch(type) {
-    case TAG_GET_LIST_SUCCESS: {
-      const {tags} = data;
+    case TagConstants.GET_LIST_SUCCESS: {
+      const {tags = []} = data;
       const expires: number = DateTime.local().plus({hours: 24}).toMillis();
       return {...state, expires, list: tags};
     }

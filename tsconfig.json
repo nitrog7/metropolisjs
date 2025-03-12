@@ -20,7 +20,6 @@
     "moduleResolution": "node",
     "noImplicitReturns": true,
     "noImplicitThis": true,
-    "noStrictGenericChecks": true,
     "noUnusedLocals": false,
     "outDir": "./lib",
     "pretty": true,

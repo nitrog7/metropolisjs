@@ -2,72 +2,70 @@
  * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import {FluxFramework} from '@nlabs/arkhamjs';
 import {parseId, parseNum} from '@nlabs/utils/lib';
 
 import {Event} from '../adapters/Event';
-import {
-  EVENT_ADD_ERROR,
-  EVENT_ADD_SUCCESS,
-  EVENT_GET_ERROR,
-  EVENT_GET_LIST_ERROR,
-  EVENT_GET_LIST_SUCCESS,
-  EVENT_GET_SUCCESS,
-  EVENT_REMOVE_ERROR,
-  EVENT_REMOVE_SUCCESS,
-  EVENT_UPDATE_ERROR,
-  EVENT_UPDATE_SUCCESS
-} from '../stores/eventStore';
-import {ApiResultsType, appMutation, appQuery} from '../utils/api';
+import {EventConstants} from '../stores/eventStore';
+import {appMutation, appQuery} from '../utils/api';
 
-export class Events {
-  CustomAdapter: any;
+
+import type {PostApiResultsType} from './PostActions';
+import type {ReaktorDbCollection} from '../utils/api';
+import type {FluxFramework} from '@nlabs/arkhamjs';
+
+const DATA_TYPE: ReaktorDbCollection = 'posts';
+
+export class EventActions {
+  CustomAdapter: typeof Event;
   flux: FluxFramework;
 
-  constructor(flux: FluxFramework, CustomAdapter: any = Event) {
+  constructor(flux: FluxFramework, CustomAdapter: typeof Event = Event) {
     this.CustomAdapter = CustomAdapter;
     this.flux = flux;
   }
 
-  async addEvent(eventData: any, eventProps: string[] = [],): Promise<any> {
+  async addEvent(eventData: Partial<Event>, eventProps: string[] = []): Promise<Event> {
     try {
       const event = new Event(eventData);
 
       const queryVariables = {
         event: {
-          type: 'EventInput!',
+          type: 'PostInput!',
           value: event.getInput()
         }
       };
 
-      const onSuccess = (data: ApiResultsType = {}) => {
-        const {addEvent = {}} = data;
-        return this.flux.dispatch({event: new this.CustomAdapter(addEvent), type: EVENT_ADD_SUCCESS});
+      const onSuccess = (data: PostApiResultsType) => {
+        const {posts: {addPost = {}}} = data;
+        return this.flux.dispatch({event: new this.CustomAdapter(addPost), type: EventConstants.ADD_ITEM_SUCCESS});
       };
 
-      return await appMutation(this.flux, 'addEvent', queryVariables, ['eventId', ...eventProps], {onSuccess});
+      const {addEvent} = await appMutation(this.flux, 'addEvent', DATA_TYPE, queryVariables, ['eventId', ...eventProps], {onSuccess});
+      return addEvent as Event;
     } catch(error) {
-      return this.flux.dispatch({error, type: EVENT_ADD_ERROR});
+      this.flux.dispatch({error, type: EventConstants.ADD_ITEM_ERROR});
+      throw error;
     }
   }
 
-  async getEvent(eventId: string, eventProps: string[] = [], CustomClass: any = Event): Promise<any> {
+  async getEvent(eventId: string, eventProps: string[] = [], CustomClass: typeof Event = Event): Promise<Event> {
     try {
       const queryVariables = {
-        eventId: {
-          type: 'EventInput!',
+        postId: {
+          type: 'ID!',
           value: parseId(eventId)
         }
       };
 
-      const onSuccess = (data: ApiResultsType = {}) => {
-        const {event = {}} = data;
-        return this.flux.dispatch({event: new CustomClass(event), type: EVENT_GET_SUCCESS});
+      const onSuccess = (data: PostApiResultsType) => {
+        const {posts: {getPost: event = {}}} = data;
+        return this.flux.dispatch({event: new CustomClass(event), type: EventConstants.GET_ITEM_SUCCESS});
       };
 
-      return await appQuery(
+      const {event} = await appQuery(
         this.flux,
         'event',
+        DATA_TYPE,
         queryVariables,
         [
           'address',
@@ -88,8 +86,10 @@ export class Events {
         ],
         {onSuccess}
       );
+      return event as Event;
     } catch(error) {
-      return this.flux.dispatch({error, type: EVENT_GET_ERROR});
+      this.flux.dispatch({error, type: EventConstants.GET_ITEM_ERROR});
+      throw error;
     }
   }
 
@@ -98,8 +98,8 @@ export class Events {
     latitude: number,
     longitude: number,
     eventProps: string[] = [],
-    CustomClass: any = Event
-  ): Promise<any> {
+    CustomClass: typeof Event = Event
+  ): Promise<Event[]> {
     const formatTags: string[] = tags.map((tag: string) => tag.trim().toLowerCase());
 
     try {
@@ -118,17 +118,18 @@ export class Events {
         }
       };
 
-      const onSuccess = (data: ApiResultsType = {}) => {
-        const {eventsByTags = []} = data;
+      const onSuccess = (data: PostApiResultsType) => {
+        const {posts: {getPostsByTags: eventsByTags = []}} = data;
         return this.flux.dispatch({
           list: eventsByTags.map((event) => new CustomClass(event)),
-          type: EVENT_GET_LIST_SUCCESS
+          type: EventConstants.GET_LIST_SUCCESS
         });
       };
 
-      return await appQuery(
+      const {eventsByTags: list} = await appQuery(
         this.flux,
         'eventsByTags',
+        DATA_TYPE,
         queryVariables,
         [
           'address',
@@ -149,8 +150,10 @@ export class Events {
         ],
         {onSuccess}
       );
+      return list as Event[];
     } catch(error) {
-      return this.flux.dispatch({error, type: EVENT_GET_LIST_ERROR});
+      this.flux.dispatch({error, type: EventConstants.GET_LIST_ERROR});
+      throw error;
     }
   }
 
@@ -159,8 +162,8 @@ export class Events {
     latitude: number,
     longitude: number,
     eventProps: string[] = [],
-    CustomClass: any = Event
-  ): Promise<any> {
+    CustomClass: typeof Event = Event
+  ): Promise<Event[]> {
     try {
       const queryVariables = {
         latitude: {
@@ -177,17 +180,18 @@ export class Events {
         }
       };
 
-      const onSuccess = (data: ApiResultsType = {}) => {
-        const {eventsByReactions = []} = data;
+      const onSuccess = (data: PostApiResultsType) => {
+        const {posts: {getPostsByReactions: eventsByReactions = []}} = data;
         return this.flux.dispatch({
           list: eventsByReactions.map((event) => new CustomClass(event)),
-          type: EVENT_GET_LIST_SUCCESS
+          type: EventConstants.GET_LIST_SUCCESS
         });
       };
 
-      return await appQuery(
+      const {eventsByReactions: list} = await appQuery(
         this.flux,
         'eventsByReactions',
+        DATA_TYPE,
         queryVariables,
         [
           'address',
@@ -208,54 +212,61 @@ export class Events {
         ],
         {onSuccess}
       );
+      return list as Event[];
     } catch(error) {
-      return this.flux.dispatch({error, type: EVENT_GET_LIST_ERROR});
+      this.flux.dispatch({error, type: EventConstants.GET_LIST_ERROR});
+      throw error;
     }
   }
 
-  async deleteEvent(eventId: string, eventProps: string[] = [], CustomClass: any = Event): Promise<any> {
+  async deleteEvent(eventId: string, eventProps: string[] = [], CustomClass: typeof Event = Event): Promise<Event> {
     try {
       const queryVariables = {
-        eventId: {
+        postId: {
           type: 'ID!',
           value: eventId
         }
       };
 
-      const onSuccess = (data: ApiResultsType = {}) => {
-        const {deleteEvent = {}} = data;
-        return this.flux.dispatch({event: new CustomClass(deleteEvent), type: EVENT_REMOVE_SUCCESS});
+      const onSuccess = (data: PostApiResultsType) => {
+        const {posts: {deletePost: event = {}}} = data;
+        return this.flux.dispatch({event: new CustomClass(event), type: EventConstants.REMOVE_ITEM_SUCCESS});
       };
 
-      return await appMutation(this.flux, 'deleteEvent', queryVariables, ['eventId', ...eventProps], {onSuccess});
+      const {deleteEvent} = await appMutation(this.flux, 'deleteEvent', DATA_TYPE, queryVariables, ['eventId', ...eventProps], {onSuccess});
+      return deleteEvent as Event;
     } catch(error) {
-      return this.flux.dispatch({error, type: EVENT_REMOVE_ERROR});
+      this.flux.dispatch({error, type: EventConstants.REMOVE_ITEM_ERROR});
+      throw error;
     }
   }
 
-  async updateEvent(event: any, eventProps: string[] = [], CustomClass: any = Event): Promise<any> {
+  async updateEvent(event: Partial<Event>, eventProps: string[] = [], CustomClass: typeof Event = Event): Promise<Event> {
     try {
       const queryVariables = {
         event: {
-          type: 'EventInput!',
+          type: 'PostInput!',
           value: event
         }
       };
 
-      const onSuccess = (data: ApiResultsType = {}) => {
-        const {updateEvent = {}} = data;
-        return this.flux.dispatch({event: new CustomClass(updateEvent), type: EVENT_UPDATE_SUCCESS});
+      const onSuccess = (data: PostApiResultsType) => {
+        const {posts: {updatePost: event = {}}} = data;
+        return this.flux.dispatch({event: new CustomClass(event), type: EventConstants.UPDATE_ITEM_SUCCESS});
       };
 
-      return await appMutation(
+      const {updateEvent} = await appMutation(
         this.flux,
         'updateEvent',
+        DATA_TYPE,
         queryVariables,
         ['added', 'content', 'endDate', 'eventId', 'name', 'startDate', ...eventProps],
         {onSuccess}
       );
+      return updateEvent as Event;
     } catch(error) {
-      return this.flux.dispatch({error, type: EVENT_UPDATE_ERROR});
+      this.flux.dispatch({error, type: EventConstants.UPDATE_ITEM_ERROR});
+      throw error;
     }
   }
 }

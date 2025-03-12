@@ -2,39 +2,33 @@
  * Copyright (c) 2021-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import {parseArangoId, parseId, parseVarChar} from '@nlabs/utils';
+import {parseVarChar} from '@nlabs/utils';
 import isNil from 'lodash/isNil';
 
-import {parseDateTime} from '../utils/dateUtils';
 import {Adapter} from './Adapter';
 
+export interface ReactionData {
+  readonly _id?: string;
+  readonly _key?: string;
+  readonly added?: number | string;
+  readonly id?: string;
+  readonly name?: string;
+  readonly reactionId?: string;
+  readonly value?: string;
+}
+
 export class Reaction extends Adapter {
-  added: number;
-  id: string;
+  static TYPE = 'reactions';
+  static TYPE_ID = 'reactionId';
+
   name: string;
   reactionId: string;
   value: string;
 
-  constructor(data: any) {
-    super();
+  constructor(data: Partial<ReactionData>) {
+    super(data);
 
-    const {_id, _key, added, id, name, reactionId, value} = data;
-
-    // ID
-    if(!isNil(_id) || !isNil(id)) {
-      this.id = parseArangoId(_id || id);
-    } else if(!isNil(reactionId)) {
-      this.id = `reactions/${parseId(reactionId)}`;
-    }
-    if(!isNil(_key) || !isNil(reactionId)) {
-      this.reactionId = parseId(_key || reactionId);
-    } else if(!isNil(id)) {
-      this.reactionId = parseId(id.split('/')[1]);
-    }
-
-    if(!isNil(added)) {
-      this.added = parseDateTime(added);
-    }
+    const {name, value} = data;
 
     if(!isNil(name)) {
       this.name = parseVarChar(name, 32);

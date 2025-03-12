@@ -6,7 +6,10 @@ import {FluxFramework} from '@nlabs/arkhamjs';
 import isEmpty from 'lodash/isEmpty';
 import pDebounce from 'p-debounce';
 
-import {appQuery} from '../utils/api';
+import {Location} from '../adapters/Location';
+import {appQuery, type ReaktorDbCollection} from '../utils/api';
+
+const DATA_TYPE: ReaktorDbCollection = 'locations';
 
 export const autoCompleteLocation = pDebounce(async (
   flux: FluxFramework,
@@ -14,8 +17,8 @@ export const autoCompleteLocation = pDebounce(async (
   latitude?: number,
   longitude?: number,
   locationProps: string[] = [],
-  CustomClass: any = Location
-): Promise<any[]> => {
+  CustomClass: typeof Location = Location
+): Promise<Location[]> => {
   if(isEmpty(address)) {
     return [];
   }
@@ -36,14 +39,15 @@ export const autoCompleteLocation = pDebounce(async (
       }
     };
 
-    const {autoCompleteLocation = []} = await appQuery(flux, 'autoCompleteLocation', queryVariables, [
+    const {autoCompleteLocation = []} = await appQuery(flux, 'autoCompleteLocation', DATA_TYPE, queryVariables, [
       'address',
       'latitude',
       'longitude',
       ...locationProps
-    ]);
+    ]) as {autoCompleteLocation: Record<string, unknown>[]};
     return autoCompleteLocation.map((item) => new CustomClass(item));
   } catch(error) {
+    console.error(error);
     return [];
   }
 }, 500);

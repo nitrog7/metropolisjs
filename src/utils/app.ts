@@ -6,7 +6,6 @@ export interface ColumnSize {
 }
 
 export const getColumnSize = (
-  theme: any,
   width: number,
   maxItemWidth: number,
   containerPadding: number = 0

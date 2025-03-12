@@ -2,8 +2,7 @@
  * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import {parseArangoId, parseId, parseNum, parseString} from '@nlabs/utils/lib';
-import {isNil} from 'lodash';
+import {parseId, parseNum, parseString} from '@nlabs/utils/lib';
 import isArray from 'lodash/isArray';
 import isUndefined from 'lodash/isUndefined';
 
@@ -11,17 +10,38 @@ import {Adapter} from './Adapter';
 import {Tag} from './Tag';
 import {User} from './User';
 
+export type PostData = {
+  readonly _id?: string;
+  readonly _key?: string;
+  readonly added?: number | string;
+  readonly cached?: number;
+  readonly content?: string;
+  readonly groupId?: string;
+  readonly id?: string;
+  readonly latitude?: number;
+  readonly longitude?: number;
+  readonly location?: string;
+  readonly mentions?: User[];
+  readonly modified?: number | string;
+  readonly name?: string;
+  readonly postId?: string;
+  readonly reactions?: string[];
+  readonly tags?: Tag[];
+  readonly type?: string;
+  readonly user?: User;
+};
+
 export class Post extends Adapter {
-  added?: number;
+  static TYPE = 'posts';
+  static TYPE_ID = 'postId';
+
   cached?: number;
   content: string;
   groupId?: string;
-  id?: string;
   latitude?: number;
   longitude?: number;
   location?: string;
   mentions?: User[];
-  modified?: number;
   name?: string;
   postId: string;
   reactions?: string[];
@@ -29,43 +49,23 @@ export class Post extends Adapter {
   type?: string;
   user?: User;
 
-  constructor(data: any) {
-    super();
+  constructor(data: Partial<PostData>) {
+    super(data);
 
     const {
-      _id,
-      _key,
-      added,
       cached,
       content,
       groupId,
-      id,
       latitude,
       longitude,
       location,
       mentions,
-      modified,
       name,
-      postId,
       reactions,
       tags,
       type,
       user
     } = data;
-
-    // ID
-    if(!isNil(_id) || !isNil(id)) {
-      this.id = parseArangoId(_id || id);
-    } else if(!isNil(postId)) {
-      this.id = `posts/${parseId(postId)}`;
-    }
-    if(!isNil(_key) || !isNil(postId)) {
-      this.postId = this.postId;
-    }
-
-    if(!isUndefined(added)) {
-      this.added = parseNum(added);
-    }
 
     if(!isUndefined(cached)) {
       this.cached = parseNum(cached);
@@ -97,13 +97,9 @@ export class Post extends Adapter {
 
     this.mentions = isArray(mentions) ? mentions : [];
 
-    if(!isUndefined(modified)) {
-      this.modified = parseNum(modified);
-    }
-
     this.reactions = isArray(reactions) ? reactions : [];
 
-    this.tags = isArray(tags) ? tags : [];
+    this.tags = isArray(tags) ? tags.map(tag => new Tag(tag)) : [];
 
     if(!isUndefined(type)) {
       this.type = parseString(type);

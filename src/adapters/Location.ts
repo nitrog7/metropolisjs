@@ -2,64 +2,56 @@
  * Copyright (c) 2021-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import {parseArangoId, parseChar, parseId, parseNum, parseString, parseVarChar} from '@nlabs/utils';
+import {parseChar, parseNum, parseString, parseVarChar} from '@nlabs/utils';
 import isNil from 'lodash/isNil';
 
-import {parseDateTime} from '../utils/dateUtils';
 import {Adapter} from './Adapter';
 
+export interface LocationData {
+  readonly _id?: string;
+  readonly _key?: string;
+  readonly added?: number | string;
+  readonly address?: string;
+  readonly city?: string;
+  readonly country?: string;
+  readonly id?: string;
+  readonly latitude?: number;
+  readonly location?: string;
+  readonly locationId?: string;
+  readonly longitude?: number;
+  readonly modified?: number | string;
+  readonly state?: string;
+  readonly street?: string;
+  readonly zip?: string;
+}
+
 export class Location extends Adapter {
-  added: number;
+  static TYPE = 'locations';
+  static TYPE_ID = 'locationId';
+
   address: string;
   city: string;
   country: string;
-  id: string;
   locationId: string;
   latitude: number;
   longitude: number;
-  modified: number;
   state: string;
   street: string;
   zip: string;
 
-  constructor(data: any) {
-    super();
+  constructor(data: Partial<LocationData>) {
+    super(data);
 
     const {
-      _id,
-      _key,
-      added,
       address,
       city,
       country,
-      id,
       latitude,
-      locationId,
       longitude,
-      modified,
       state,
       street,
       zip
     } = data;
-
-    // ID
-    if(!isNil(_id) || !isNil(id)) {
-      this.id = parseArangoId(_id || id);
-    } else if(!isNil(locationId)) {
-      this.id = `locations/${parseId(locationId)}`;
-    }
-    if(!isNil(_key) || !isNil(locationId)) {
-      this.locationId = parseId(_key || locationId);
-    } else if(!isNil(id)) {
-      this.locationId = parseId(id.split('/')[1]);
-    }
-
-    if(!isNil(added)) {
-      this.added = parseDateTime(added);
-    }
-    if(!isNil(modified)) {
-      this.modified = parseDateTime(modified);
-    }
 
     if(!isNil(address)) {
       this.address = parseString(address, 128);

@@ -2,36 +2,45 @@
  * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import {FluxFramework} from '@nlabs/arkhamjs';
 import {parseString} from '@nlabs/utils';
 
 import {Image} from '../adapters/Image';
 import {Config} from '../config';
-import {
-  IMAGE_ADD_ERROR,
-  IMAGE_ADD_SUCCESS,
-  IMAGE_DELETE_ERROR,
-  IMAGE_DELETE_SUCCESS,
-  IMAGE_GET_COUNT_ERROR,
-  IMAGE_GET_COUNT_SUCCESS,
-  IMAGE_GET_LIST_ERROR,
-  IMAGE_GET_LIST_SUCCESS,
-  IMAGE_UPLOAD_ERROR,
-  IMAGE_UPLOAD_SUCCESS
-} from '../stores/imageStore';
-import {ApiResultsType, appMutation, appQuery, uploadImage} from '../utils/api';
+import {ImageConstants} from '../stores/imageStore';
+import {appMutation, appQuery, uploadImage} from '../utils/api';
 import {convertFileToBase64} from '../utils/file';
 
-export class Images {
-  CustomAdapter: any;
+import type {ApiResultsType,ReaktorDbCollection} from '../utils/api';
+import type {FluxFramework} from '@nlabs/arkhamjs';
+
+const DATA_TYPE: ReaktorDbCollection = 'images';
+
+export type ImageApiResultsType = {
+  addImage: Image;
+  deleteImage: Image;
+  image: Image;
+  updateImage: Image;
+  uploadFileImages: Image[];
+  getImageCount: number;
+  getImagesByItem: Image[];
+  getImagesByReactions: Image[];
+};
+
+
+export class ImageActions {
+  CustomAdapter: typeof Image;
   flux: FluxFramework;
 
-  constructor(flux: FluxFramework, CustomAdapter: any = Image) {
+  constructor(flux: FluxFramework, CustomAdapter: typeof Image = Image) {
     this.CustomAdapter = CustomAdapter;
     this.flux = flux;
   }
 
-  async addImage(image: Partial<Image>, type: string = 'image', CustomClass: any = Image): Promise<any> {
+  async add(
+    image: Partial<Image>,
+    type: string = 'image',
+    CustomClass: typeof Image = Image
+  ): Promise<Image> {
     try {
       const {base64, description, itemId} = new Image(image).getInput();
       const formatImage = {
@@ -43,13 +52,19 @@ export class Images {
       };
 
       const {image: newImage} = await uploadImage(this.flux, formatImage);
-      return this.flux.dispatch({image: new CustomClass(newImage), type: IMAGE_ADD_SUCCESS});
+      await this.flux.dispatch({image: new CustomClass(newImage), type: ImageConstants.ADD_ITEM_SUCCESS});
+      return newImage as Image;
     } catch(error) {
-      return this.flux.dispatch({error, type: IMAGE_ADD_ERROR});
+      this.flux.dispatch({error, type: ImageConstants.ADD_ITEM_ERROR});
+      throw error;
     }
   }
 
-  async deleteImage(imageId: string, imageProps: string[] = [], CustomClass: any = Image): Promise<any> {
+  async delete(
+    imageId: string,
+    imageProps: string[] = [],
+    CustomClass: typeof Image = Image
+  ): Promise<Image> {
     try {
       const queryVariables = {
         imageId: {
@@ -60,16 +75,22 @@ export class Images {
 
       const onSuccess = (data: ApiResultsType = {}) => {
         const {deleteImage = {}} = data;
-        return this.flux.dispatch({image: new CustomClass(deleteImage), type: IMAGE_DELETE_SUCCESS});
+        return this.flux.dispatch({image: new CustomClass(deleteImage), type: ImageConstants.REMOVE_ITEM_SUCCESS});
       };
 
-      return await appMutation(this.flux, 'deleteImage', queryVariables, ['id', ...imageProps], {onSuccess});
+      const {deleteImage} = await appMutation(this.flux, 'deleteImage', DATA_TYPE, queryVariables, ['id', ...imageProps], {onSuccess});
+      return deleteImage as Image;
     } catch(error) {
-      return this.flux.dispatch({error, type: IMAGE_DELETE_ERROR});
+      this.flux.dispatch({error, type: ImageConstants.REMOVE_ITEM_ERROR});
+      throw error;
     }
   }
 
-  async updateImage(image: Partial<Image>, type: string = 'image', CustomClass: any = Image): Promise<any> {
+  async update(
+    image: Partial<Image>,
+    type: string = 'image',
+    CustomClass: typeof Image = Image
+  ): Promise<Image> {
     try {
       const {base64, description, itemId} = new Image(image).getInput();
       const formatImage = {
@@ -81,29 +102,37 @@ export class Images {
       };
 
       const {image: newImage} = await uploadImage(this.flux, formatImage);
-      return this.flux.dispatch({image: new CustomClass(newImage), type: IMAGE_ADD_SUCCESS});
+      await this.flux.dispatch({image: new CustomClass(newImage), type: ImageConstants.ADD_ITEM_SUCCESS});
+      return newImage as Image;
     } catch(error) {
-      return this.flux.dispatch({error, type: IMAGE_ADD_ERROR});
+      this.flux.dispatch({error, type: ImageConstants.ADD_ITEM_ERROR});
+      throw error;
     }
   }
 
-  async uploadFileImages(imageFiles: File[], itemId: string, itemType: string = 'users'): Promise<any> {
+  async upload(
+    imageFiles: File[],
+    itemId: string,
+    itemType: string = 'users'
+  ): Promise<Image[]> {
     try {
       const savedImages = await Promise.all(
         imageFiles.map(async (file: File) => {
           const base64: string = await convertFileToBase64(file, Config.get('app.images.maxImageSize'));
           const {type: fileType} = file;
-          return this.addImage({base64, fileType, itemId}, itemType);
+          return this.add({base64, fileType, itemId}, itemType);
         })
       );
 
-      return this.flux.dispatch({images: savedImages, type: IMAGE_UPLOAD_SUCCESS});
+      await this.flux.dispatch({images: savedImages, type: ImageConstants.UPLOAD_ITEM_SUCCESS});
+      return savedImages;
     } catch(error) {
-      return this.flux.dispatch({error, type: IMAGE_UPLOAD_ERROR});
+      this.flux.dispatch({error, type: ImageConstants.UPLOAD_ITEM_ERROR});
+      throw error;
     }
   }
 
-  async getImageCount(itemId: string): Promise<any> {
+  async countByItem(itemId: string): Promise<number> {
     try {
       const queryVariables = {
         itemId: {
@@ -114,22 +143,24 @@ export class Images {
 
       const onSuccess = (data: ApiResultsType = {}) => {
         const {imageCount: count = 0} = data;
-        return this.flux.dispatch({itemId, count, type: IMAGE_GET_COUNT_SUCCESS});
+        return this.flux.dispatch({itemId, count, type: ImageConstants.GET_COUNT_SUCCESS});
       };
 
-      return appQuery(this.flux, 'imageCount', queryVariables, ['count'], {onSuccess});
+      const {imageCount} = await appQuery(this.flux, 'imageCount', DATA_TYPE, queryVariables, ['count'], {onSuccess});
+      return imageCount as number;
     } catch(error) {
-      return this.flux.dispatch({error, type: IMAGE_GET_COUNT_ERROR});
+      this.flux.dispatch({error, type: ImageConstants.GET_COUNT_ERROR});
+      throw error;
     }
   }
 
-  getImagesByItem(
+  async listByItem(
     itemId: string,
     from: number = 0,
     to: number = 10,
     imageProps: string[] = [],
-    CustomClass: any = Image
-  ): Promise<any> {
+    CustomClass: typeof Image = Image
+  ): Promise<Image[]> {
     try {
       const queryVariables = {
         from: {
@@ -147,17 +178,18 @@ export class Images {
       };
 
       const onSuccess = (data: ApiResultsType = {}) => {
-        const {imagesByItem = []} = data;
+        const {imagesByItem = []} = data as {imagesByItem: Image[]};
         return this.flux.dispatch({
           itemId,
           list: imagesByItem.map((item) => new CustomClass(item)),
-          type: IMAGE_GET_LIST_SUCCESS
+          type: ImageConstants.GET_LIST_SUCCESS
         });
       };
 
-      return appQuery(
+      const {imagesByItem} = await appQuery(
         this.flux,
         'imagesByItem',
+        DATA_TYPE,
         queryVariables,
         [
           'color',
@@ -174,18 +206,20 @@ export class Images {
         ],
         {onSuccess}
       );
+      return imagesByItem as Image[];
     } catch(error) {
-      return this.flux.dispatch({error, type: IMAGE_GET_LIST_ERROR});
+      this.flux.dispatch({error, type: ImageConstants.GET_LIST_ERROR});
+      throw error;
     }
   }
 
-  getImagesByReactions(
+  async listByReactions(
     reactions: string[],
     from: number = 0,
     to: number = 10,
     imageProps: string[] = [],
-    CustomClass: any = Image
-  ): Promise<any> {
+    CustomClass: typeof Image = Image
+  ): Promise<Image[]> {
     try {
       const queryVariables = {
         from: {
@@ -203,16 +237,17 @@ export class Images {
       };
 
       const onSuccess = (data: ApiResultsType = {}) => {
-        const {imagesByReaction = []} = data;
+        const {imagesByReaction = []} = data as {imagesByReaction: Image[]};
         return this.flux.dispatch({
           list: imagesByReaction.map((item) => new CustomClass(item)),
-          type: IMAGE_GET_LIST_SUCCESS
+          type: ImageConstants.GET_LIST_SUCCESS
         });
       };
 
-      return appQuery(
+      const {imagesByReaction: list} = await appQuery(
         this.flux,
         'imagesByReaction',
+        DATA_TYPE,
         queryVariables,
         [
           'color',
@@ -229,8 +264,10 @@ export class Images {
         ],
         {onSuccess}
       );
+      return list as Image[];
     } catch(error) {
-      return this.flux.dispatch({error, type: IMAGE_GET_LIST_ERROR});
+      this.flux.dispatch({error, type: ImageConstants.GET_LIST_ERROR});
+      throw error;
     }
   }
 }

@@ -2,25 +2,33 @@
  * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-export const LOCATION_ADD_ERROR: string = 'LOCATION_ADD_ERROR';
-export const LOCATION_ADD_SUCCESS: string = 'LOCATION_ADD_SUCCESS';
-export const LOCATION_DELETE_ERROR: string = 'LOCATION_DELETE_ERROR';
-export const LOCATION_DELETE_SUCCESS: string = 'LOCATION_DELETE_SUCCESS';
-export const LOCATION_GET_DETAILS_ERROR: string = 'LOCATION_GET_DETAILS_ERROR';
-export const LOCATION_GET_DETAILS_SUCCESS: string = 'LOCATION_GET_DETAILS_SUCCESS';
-export const LOCATION_GET_LIST_ERROR: string = 'LOCATION_GET_LIST_ERROR';
-export const LOCATION_GET_LIST_SUCCESS: string = 'LOCATION_GET_LIST_SUCCESS';
-export const LOCATION_SET_CURRENT: string = 'LOCATION_SET_CURRENT';
-export const LOCATION_UPDATE_ERROR: string = 'LOCATION_UPDATE_ERROR';
-export const LOCATION_UPDATE_SUCCESS: string = 'LOCATION_UPDATE_SUCCESS';
+import type {Location} from '../adapters';
 
-const defaultValues: any = {
+export class LocationConstants {
+  static readonly ADD_ITEM_ERROR: string = 'LOCATION_ADD_ITEM_ERROR';
+  static readonly ADD_ITEM_SUCCESS: string = 'LOCATION_ADD_ITEM_SUCCESS';
+  static readonly GET_ITEM_ERROR: string = 'LOCATION_GET_ITEM_ERROR';
+  static readonly GET_ITEM_SUCCESS: string = 'LOCATION_GET_ITEM_SUCCESS';
+  static readonly GET_LIST_ERROR: string = 'LOCATION_GET_LIST_ERROR';
+  static readonly GET_LIST_SUCCESS: string = 'LOCATION_GET_LIST_SUCCESS';
+  static readonly REMOVE_ITEM_ERROR: string = 'LOCATION_REMOVE_ITEM_ERROR';
+  static readonly REMOVE_ITEM_SUCCESS: string = 'LOCATION_REMOVE_ITEM_SUCCESS';
+  static readonly SET_CURRENT: string = 'LOCATION_SET_CURRENT';
+  static readonly UPDATE_ITEM_ERROR: string = 'LOCATION_UPDATE_ITEM_ERROR';
+  static readonly UPDATE_ITEM_SUCCESS: string = 'LOCATION_UPDATE_ITEM_SUCCESS';
+}
+
+interface LocationState {
+  current: Location | null;
+}
+
+export const defaultValues: LocationState = {
   current: null
 };
 
-export const locationStore = (type: string, data, state = defaultValues): any => {
+export const locationStore = (type: string, data: {current?: Location}, state = defaultValues): LocationState => {
   switch(type) {
-    case LOCATION_SET_CURRENT: {
+    case LocationConstants.SET_CURRENT: {
       const {current} = data;
       return {...state, current};
     }

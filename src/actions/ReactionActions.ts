@@ -2,26 +2,31 @@
  * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import {Flux, FluxFramework} from '@nlabs/arkhamjs';
+import {Flux} from '@nlabs/arkhamjs';
 
 import {Reaction} from '../adapters/Reaction';
-import {
-  REACTION_ADD_ERROR,
-  REACTION_ADD_SUCCESS,
-  REACTION_COUNT_ERROR,
-  REACTION_COUNT_SUCCESS,
-  REACTION_DELETE_ERROR,
-  REACTION_DELETE_SUCCESS,
-  REACTION_HAS_ERROR,
-  REACTION_HAS_SUCCESS
-} from '../stores/reactionStore';
-import {ApiResultsType, appMutation, appQuery} from '../utils/api';
+import {ReactionConstants} from '../stores/reactionStore';
+import {appMutation, appQuery} from '../utils/api';
 
-export class Reactions {
-  CustomAdapter: any;
+import type {ReaktorDbCollection} from '../utils/api';
+import type {FluxFramework} from '@nlabs/arkhamjs';
+
+const DATA_TYPE: ReaktorDbCollection = 'reactions';
+
+export type ReactionApiResultsType = {
+  reactions: {
+    addReaction: Reaction;
+    deleteReaction: Reaction;
+    getReactionCount: number;
+    hasReaction: boolean;
+  }
+};
+
+export class ReactionActions {
+  CustomAdapter: typeof Reaction;
   flux: FluxFramework;
 
-  constructor(flux: FluxFramework, CustomAdapter: any = Reaction) {
+  constructor(flux: FluxFramework, CustomAdapter: typeof Reaction = Reaction) {
     this.CustomAdapter = CustomAdapter;
     this.flux = flux;
   }
@@ -29,10 +34,10 @@ export class Reactions {
   async addReaction(
     itemId: string,
     itemType: string,
-    reaction: any,
+    reaction: Partial<Reaction>,
     reactionProps: string[] = [],
-    CustomClass = Reaction
-  ) {
+    CustomClass: typeof Reaction = Reaction
+  ): Promise<Reaction> {
     const {value} = reaction;
     const formatValue = value !== undefined ? value.toString() : value;
 
@@ -51,15 +56,18 @@ export class Reactions {
         }
       };
 
-      const onSuccess = (data: ApiResultsType = {}) => {
-        const {addReaction = {}} = data;
-        return Flux.dispatch({itemId, itemType, reaction: new CustomClass(addReaction), type: REACTION_ADD_SUCCESS});
+      const onSuccess = (data: ReactionApiResultsType) => {
+        const {reactions: {addReaction: reaction = {}}} = data;
+        return Flux.dispatch({itemId, itemType, reaction: new CustomClass(reaction), type: ReactionConstants.ADD_ITEM_SUCCESS});
       };
-      return await appMutation(this.flux, 'addReaction', queryVariables, ['id', 'name', 'value', ...reactionProps], {
+      const {reaction: addedReaction} = await appMutation(this.flux, 'addReaction', DATA_TYPE, queryVariables, ['id', 'name', 'value', ...reactionProps], {
         onSuccess
       });
+
+      return addedReaction as Reaction;
     } catch(error) {
-      return Flux.dispatch({error, type: REACTION_ADD_ERROR});
+      this.flux.dispatch({error, type: ReactionConstants.ADD_ITEM_ERROR});
+      throw error;
     }
   }
 
@@ -69,7 +77,7 @@ export class Reactions {
     reactionName: string,
     reactionProps: string[] = [],
     CustomClass = Reaction
-  ) {
+  ): Promise<Reaction> {
     try {
       const queryVariables = {
         itemId: {
@@ -82,24 +90,27 @@ export class Reactions {
         }
       };
 
-      const onSuccess = (data: ApiResultsType = {}) => {
-        const {deleteReaction = {}} = data;
+      const onSuccess = (data: ReactionApiResultsType) => {
+        const {reactions: {deleteReaction: reaction = {}}} = data;
         return Flux.dispatch({
           itemId,
           itemType,
-          reaction: new CustomClass(deleteReaction),
-          type: REACTION_DELETE_SUCCESS
+          reaction: new CustomClass(reaction),
+          type: ReactionConstants.REMOVE_ITEM_SUCCESS
         });
       };
-      return await appMutation(this.flux, 'deleteReaction', queryVariables, ['id', 'name', 'value', ...reactionProps], {
+      const {reaction: deletedReaction} = await appMutation(this.flux, 'deleteReaction', DATA_TYPE, queryVariables, ['id', 'name', 'value', ...reactionProps], {
         onSuccess
       });
+
+      return deletedReaction as Reaction;
     } catch(error) {
-      return Flux.dispatch({error, type: REACTION_DELETE_ERROR});
+      this.flux.dispatch({error, type: ReactionConstants.REMOVE_ITEM_ERROR});
+      throw error;
     }
   }
 
-  async getReactionCount(itemId: string, itemType: string, reactionName: string) {
+  async getReactionCount(itemId: string, itemType: string, reactionName: string): Promise<number> {
     try {
       const queryVariables = {
         itemId: {
@@ -112,22 +123,31 @@ export class Reactions {
         }
       };
 
-      const onSuccess = (data: ApiResultsType = {}) => {
-        const {reactionCount: {count = 0} = {}} = data;
-        return Flux.dispatch({
-          count,
+      const onSuccess = (data: ReactionApiResultsType) => {
+        const {reactions: {getReactionCount}} = data;
+        return this.flux.dispatch({
+          count: getReactionCount,
           itemId,
           name: reactionName,
-          type: REACTION_COUNT_SUCCESS
+          type: ReactionConstants.GET_COUNT_SUCCESS
         });
       };
-      return await appQuery(this.flux, 'reactionCount', queryVariables, ['count'], {onSuccess});
+      const {count: reactionCount} = await appQuery(
+        this.flux,
+        'reactionCount',
+        DATA_TYPE,
+        queryVariables,
+        ['count'],
+        {onSuccess}
+      );
+      return reactionCount as number;
     } catch(error) {
-      return Flux.dispatch({error, type: REACTION_COUNT_ERROR});
+      this.flux.dispatch({error, type: ReactionConstants.GET_COUNT_ERROR});
+      throw error;
     }
   }
 
-  async hasReaction(itemId: string, itemType: string, reactionName: string, direction: string) {
+  async hasReaction(itemId: string, itemType: string, reactionName: string, direction: string): Promise<boolean> {
     try {
       const queryVariables = {
         direction: {
@@ -144,18 +164,27 @@ export class Reactions {
         }
       };
 
-      const onSuccess = (data: ApiResultsType = {}) => {
-        const {hasReaction = false} = data;
+      const onSuccess = (data: ReactionApiResultsType) => {
+        const {reactions: {hasReaction}} = data;
         return Flux.dispatch({
           hasReaction,
           itemId: `${itemType}/${itemId}`,
           name: reactionName,
-          type: REACTION_HAS_SUCCESS
+          type: ReactionConstants.HAS_SUCCESS
         });
       };
-      return await appQuery(this.flux, 'hasReaction', queryVariables, null, {onSuccess});
+      const {hasReaction: hasReactionResult} = await appQuery(
+        this.flux,
+        'hasReaction',
+        DATA_TYPE,
+        queryVariables,
+        null,
+        {onSuccess}
+      );
+      return hasReactionResult as boolean;
     } catch(error) {
-      return Flux.dispatch({error, type: REACTION_HAS_ERROR});
+      this.flux.dispatch({error, type: ReactionConstants.HAS_ERROR});
+      throw error;
     }
   }
 
