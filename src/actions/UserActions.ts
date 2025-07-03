@@ -4,8 +4,7 @@
  */
 import {DateTime} from 'luxon';
 
-import {Persona} from '../adapters/Persona';
-import {User} from '../adapters/User';
+import {Persona, User} from '../adapters/legacyCompatibility';
 import {UserConstants} from '../stores/userStore';
 import {appMutation, appQuery, publicMutation, refreshSession} from '../utils/api';
 

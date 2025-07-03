@@ -4,7 +4,7 @@
  */
 import {Flux} from '@nlabs/arkhamjs';
 
-import {Reaction} from '../adapters/Reaction';
+import {Reaction} from '../adapters/legacyCompatibility';
 import {ReactionConstants} from '../stores/reactionStore';
 import {appMutation, appQuery} from '../utils/api';
 

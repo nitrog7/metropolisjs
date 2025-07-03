@@ -2,7 +2,7 @@
  * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import type {Message} from '../adapters';
+import type {MessageType} from '../adapters/messageAdapter';
 
 export class MessageConstants {
   static readonly ADD_ITEM_ERROR: string = 'MESSAGE_ADD_ITEM_ERROR';
@@ -20,7 +20,7 @@ export class MessageConstants {
 }
 
 interface MessageState {
-  conversations: Record<string, Message[]>;
+  conversations: Record<string, MessageType[]>;
 }
 
 export const defaultValues: MessageState = {
@@ -28,7 +28,7 @@ export const defaultValues: MessageState = {
 };
 
 export const messages = (type: string, data: {
-  list?: Message[];
+  list?: MessageType[];
   conversationId?: string;
 }, state = defaultValues): MessageState => {
   switch(type) {

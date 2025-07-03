@@ -2,7 +2,7 @@
  * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import type {Post} from '../adapters';
+import type {PostType} from '../adapters/postAdapter';
 
 export class PostConstants {
   static readonly ADD_ITEM_ERROR: string = 'POST_ADD_ITEM_ERROR';
@@ -18,8 +18,8 @@ export class PostConstants {
 }
 
 interface PostState {
-  lists: Record<string, Post[]>;
-  viewed: Record<string, Post>;
+  lists: Record<string, PostType[]>;
+  viewed: Record<string, PostType>;
 }
 
 export const defaultValues: PostState = {
@@ -27,12 +27,12 @@ export const defaultValues: PostState = {
   viewed: {}
 };
 
-export const posts = (type: string, data: {post?: Post}, state = defaultValues): PostState => {
+export const posts = (type: string, data: {post?: PostType}, state = defaultValues): PostState => {
   switch(type) {
     case PostConstants.GET_ITEM_SUCCESS: {
       const {viewed} = state;
       const {post} = data;
-      viewed[post.postId] = {...post.toJson(), cached: Date.now()} as Post;
+      viewed[post.postId] = {...post, cached: Date.now()} as PostType;
       return {...state, viewed};
     }
     default: {

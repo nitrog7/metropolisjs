@@ -2,7 +2,7 @@
  * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import type {Image} from '../adapters';
+import type {ImageType} from '../adapters/imageAdapter';
 
 export class ImageConstants {
   static readonly ADD_ITEM_ERROR: string = 'IMAGE_ADD_ITEM_ERROR';
@@ -19,7 +19,7 @@ export class ImageConstants {
 }
 
 interface ImageState {
-  lists: Record<string, Image[]>;
+  lists: Record<string, ImageType[]>;
 }
 
 export const defaultValues: ImageState = {
@@ -27,7 +27,7 @@ export const defaultValues: ImageState = {
 };
 
 export const images = (type: string, data: {
-  list?: Image[];
+  list?: ImageType[];
   itemId?: string;
 }, state = defaultValues): ImageState => {
   switch(type) {

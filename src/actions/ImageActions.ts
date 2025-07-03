@@ -4,13 +4,13 @@
  */
 import {parseString} from '@nlabs/utils';
 
-import {Image} from '../adapters/Image';
+import {Image} from '../adapters/legacyCompatibility';
 import {Config} from '../config';
 import {ImageConstants} from '../stores/imageStore';
 import {appMutation, appQuery, uploadImage} from '../utils/api';
 import {convertFileToBase64} from '../utils/file';
 
-import type {ApiResultsType,ReaktorDbCollection} from '../utils/api';
+import type {ApiResultsType, ReaktorDbCollection} from '../utils/api';
 import type {FluxFramework} from '@nlabs/arkhamjs';
 
 const DATA_TYPE: ReaktorDbCollection = 'images';

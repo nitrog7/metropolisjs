@@ -4,7 +4,7 @@
  */
 import {parseId, parseNum, parseString, parseVarChar} from '@nlabs/utils';
 
-import {Post} from '../adapters/Post';
+import {Post} from '../adapters/legacyCompatibility';
 import {PostConstants} from '../stores/postStore';
 import {appMutation, appQuery} from '../utils/api';
 

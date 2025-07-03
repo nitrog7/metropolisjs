@@ -3,13 +3,12 @@
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
 
-import {Message} from '../adapters/Message';
+import {Conversation, Message} from '../adapters/legacyCompatibility';
 import {MessageConstants} from '../stores/messageStore';
 import {appMutation, appQuery} from '../utils/api';
 
-import type {Conversation} from '../adapters';
 import type {ApiResultsType, ReaktorDbCollection} from '../utils/api';
-import type{FluxFramework} from '@nlabs/arkhamjs';
+import type {FluxFramework} from '@nlabs/arkhamjs';
 
 const DATA_TYPE: ReaktorDbCollection = 'messages';
 

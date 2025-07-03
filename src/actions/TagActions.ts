@@ -2,7 +2,7 @@
  * Copyright (c) 2021-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import {Tag} from '../adapters/Tag';
+import {Tag} from '../adapters/legacyCompatibility';
 import {TagConstants} from '../stores/tagStore';
 import {appMutation, appQuery} from '../utils/api';
 

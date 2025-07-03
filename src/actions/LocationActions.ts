@@ -4,7 +4,7 @@
  */
 import {get as httpGet} from '@nlabs/rip-hunter';
 
-import {Location} from '../adapters/Location';
+import {Location} from '../adapters/legacyCompatibility';
 import {Config} from '../config';
 import {LocationConstants} from '../stores/locationStore';
 import {appMutation} from '../utils/api';

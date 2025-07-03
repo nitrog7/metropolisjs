@@ -4,28 +4,30 @@
  */
 import React, {createContext} from 'react';
 
-import type {Event, Image, Location, Message, Post, Reaction, Tag, User} from '../adapters';
+import {parseEvent, parseImage, parseLocation, parseMessage, parsePost, parseReaction, parseTag, parseUser} from '../adapters';
+
+import type {MessageType} from '../adapters';
 import type {SessionType} from './api';
 
 export interface MetropolisAdapters {
-  readonly Event?: typeof Event;
-  readonly Image?: typeof Image;
-  readonly Location?: typeof Location;
-  readonly Message?: typeof Message;
-  readonly Post?: typeof Post;
-  readonly Reaction?: typeof Reaction;
-  readonly Tag?: typeof Tag;
-  readonly User?: typeof User;
+  readonly Event?: typeof parseEvent;
+  readonly Image?: typeof parseImage;
+  readonly Location?: typeof parseLocation;
+  readonly Message?: typeof parseMessage;
+  readonly Post?: typeof parsePost;
+  readonly Reaction?: typeof parseReaction;
+  readonly Tag?: typeof parseTag;
+  readonly User?: typeof parseUser;
 }
 
 export interface MetropolisProviderProps {
   readonly children?: React.ReactElement | React.ReactElement[];
   readonly adapters?: MetropolisAdapters;
   readonly isAuth?: () => boolean;
-  readonly messages?: Message[];
+  readonly messages?: MessageType[];
   readonly notifications?: Notification[];
   readonly session?: SessionType;
-  readonly updateMessage: (message: Message) => void;
+  readonly updateMessage: (message: MessageType) => void;
   readonly updateNotification: (notification: Notification) => void;
 }
 

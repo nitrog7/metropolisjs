@@ -1,9 +1,9 @@
 import {FluxFramework} from '@nlabs/arkhamjs';
 import {DateTime} from 'luxon';
 
-import {UserActions} from './UserActions';
-import {User} from '../adapters/User';
+import {User} from '../adapters/legacyCompatibility';
 import {Config} from '../config';
+import {UserActions} from './UserActions';
 
 describe('UserActions', () => {
   let flux: FluxFramework;

@@ -4,7 +4,7 @@
  */
 import {DateTime} from 'luxon';
 
-import type {Tag} from '../adapters';
+import type {TagType} from '../adapters/tagAdapter';
 
 export class TagConstants {
   static readonly ADD_ITEM_ERROR: string = 'TAG_ADD_ITEM_ERROR';
@@ -23,7 +23,7 @@ export class TagConstants {
 
 interface TagState {
   expires: number;
-  list: Tag[];
+  list: TagType[];
 }
 
 export const defaultValues: TagState = {

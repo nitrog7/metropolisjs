@@ -47,7 +47,8 @@
     "luxon": "^3.5.0",
     "p-debounce": "^4.0.0",
     "react": "^19.0.0",
-    "sockette": "^2.0.6"
+    "sockette": "^2.0.6",
+    "zod": "^3.25.71"
   },
   "devDependencies": {
     "@nlabs/arkhamjs": "*",

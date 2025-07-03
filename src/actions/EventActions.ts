@@ -4,7 +4,7 @@
  */
 import {parseId, parseNum} from '@nlabs/utils/lib';
 
-import {Event} from '../adapters/Event';
+import {Event} from '../adapters/legacyCompatibility';
 import {EventConstants} from '../stores/eventStore';
 import {appMutation, appQuery} from '../utils/api';
 

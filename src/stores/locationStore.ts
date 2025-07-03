@@ -2,7 +2,7 @@
  * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import type {Location} from '../adapters';
+import type {LocationType} from '../adapters/locationAdapter';
 
 export class LocationConstants {
   static readonly ADD_ITEM_ERROR: string = 'LOCATION_ADD_ITEM_ERROR';
@@ -19,14 +19,14 @@ export class LocationConstants {
 }
 
 interface LocationState {
-  current: Location | null;
+  current: LocationType | null;
 }
 
 export const defaultValues: LocationState = {
   current: null
 };
 
-export const locations = (type: string, data: {current?: Location}, state = defaultValues): LocationState => {
+export const locations = (type: string, data: {current?: LocationType}, state = defaultValues): LocationState => {
   switch(type) {
     case LocationConstants.SET_CURRENT: {
       const {current} = data;

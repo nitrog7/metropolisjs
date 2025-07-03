@@ -10,8 +10,8 @@ import uniqBy from 'lodash/uniqBy';
 import {ReactionConstants} from './reactionStore';
 import {TagConstants} from './tagStore';
 
-import type {Reaction, User} from '../adapters';
-import type {Persona} from '../adapters/Persona';
+import type {ReactionType, UserType} from '../adapters';
+import type {PersonaType} from '../adapters/personaAdapter';
 
 export class UserConstants {
   static readonly ADD_ITEM_ERROR: string = 'USER_ADD_ITEM_ERROR';
@@ -57,8 +57,8 @@ export class UserConstants {
 interface UserState {
   likes: string[];
   lists: Record<string, unknown>;
-  session: Partial<User>;
-  users: Record<string, Partial<User>>;
+  session: Partial<UserType>;
+  users: Record<string, Partial<UserType>>;
 }
 
 export const defaultValues: UserState = {
@@ -76,12 +76,12 @@ export const countFieldMap = {
 interface UserData {
   readonly itemId?: string;
   readonly itemType?: string;
-  readonly list?: User[];
-  readonly persona?: Persona;
-  readonly reaction?: Reaction;
-  readonly session?: User;
+  readonly list?: UserType[];
+  readonly persona?: PersonaType;
+  readonly reaction?: ReactionType;
+  readonly session?: UserType;
   readonly tag?: Record<string, unknown>;
-  readonly user?: User;
+  readonly user?: UserType;
 }
 
 export const users = (type: string, data: UserData, state = defaultValues): UserState => {
@@ -143,8 +143,8 @@ export const users = (type: string, data: UserData, state = defaultValues): User
       const {list} = data;
       const {users} = state;
 
-      list.forEach((user: User) => {
-        const cachedUser: Partial<User> = users[user.userId] || {};
+      list.forEach((user: UserType) => {
+        const cachedUser: Partial<UserType> = users[user.userId] || {};
         users[user.userId] = {...cachedUser, ...user.toJson()};
       });
       return {...state, users};
