@@ -25,7 +25,7 @@ export const defaultValues: EventState = {
   lists: {}
 };
 
-export const eventStore = (type: string, data: {
+export const events = (type: string, data: {
   list?: Event[];
   type?: string;
 }, state = defaultValues): EventState => {

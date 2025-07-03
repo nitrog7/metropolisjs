@@ -1,10 +1,41 @@
 {
-  "cSpell.words": ["arkham", "arkhamjs", "nitrogenlabs", "nlabs", "transpiler"],
+  "[javascript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "cSpell.words": [
+    "arkham",
+    "arkhamjs",
+    "nitrogenlabs",
+    "nlabs",
+    "polyfill",
+    "starfire",
+    "transpiler"
+  ],
   "css.validate": false,
   "editor.autoClosingBrackets": "never",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "editor.detectIndentation": false,
   "editor.formatOnSave": true,
-  "editor.rulers": [120],
+  "editor.formatOnType": true,
+  "editor.rulers": [
+    120
+  ],
   "editor.tabCompletion": "on",
   "editor.tabSize": 2,
   "editor.wordWrap": "off",
@@ -16,55 +47,46 @@
   "emmet.syntaxProfiles": {
     "postcss": "css"
   },
-  "eslint.autoFixOnSave": true,
-  "eslint.alwaysShowStatus": true,
   "eslint.enable": true,
-  "eslint.packageManager": "yarn",
+  "eslint.experimental.useFlatConfig": true,
+  "eslint.format.enable": true,
+  "eslint.nodePath": "node_modules/@nlabs/lex/node_modules",
+  "eslint.options": {
+    "overrideConfigFile": "node_modules/@nlabs/lex/eslint.config.js"
+  },
+  "eslint.run": "onSave",
   "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.workingDirectories": [
     {
-      "language": "javascript",
-      "autoFix": true
-    },
-    {
-      "language": "javascriptreact",
-      "autoFix": true
-    },
-    {
-      "language": "typescript",
-      "autoFix": true
-    },
-    {
-      "language": "typescriptreact",
-      "autoFix": true
+      "mode": "auto"
     }
   ],
-  "explorer.decorations.badges": false,
-  "files.autoSave": "onFocusChange",
-  "html.format.indentInnerHtml": true,
-  "html.format.indentHandlebars": true,
-  "html.suggest.html5": false,
   "explorer.confirmDragAndDrop": false,
-  "files.trimTrailingWhitespace": true,
-  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": false,
-  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+  "explorer.decorations.badges": false,
+  "files.trimTrailingWhitespace": false,
+  "html.format.enable": false,
+  "html.format.extraLiners": "",
+  "html.format.indentHandlebars": true,
+  "html.format.indentInnerHtml": true,
+  "javascript.format.enable": true,
   "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
   "javascript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
-  "javascript.updateImportsOnFileMove.enabled": "never",
-  "html.autoClosingTags": false,
-  "html.format.enable": false,
-  "html.format.endWithNewline": true,
-  "html.format.extraLiners": "",
-  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": false,
-  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+  "javascript.validate.enable": true,
+  "jest.disabledWorkspaceFolders": [
+    "execa-mock",
+    "favicons-webpack-plugin"
+  ],
+  "jest.jestCommandLine": "jest",
+  "jest.rootPath": "./",
+  "prettier.enable": false,
   "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
   "typescript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
-  "typescript.updateImportsOnFileMove.enabled": "never",
-  "typescriptHero.imports.insertSpaceBeforeAndAfterImportBraces": false,
-  "typescriptHero.imports.multiLineTrailingComma": false,
-  "typescriptHero.imports.multiLineWrapThreshold": 120,
-  "typescriptHero.imports.organizeOnSave": true,
-  "window.zoomLevel": 0,
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
-  }
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

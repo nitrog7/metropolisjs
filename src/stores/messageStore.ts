@@ -27,7 +27,7 @@ export const defaultValues: MessageState = {
   conversations: {}
 };
 
-export const messageStore = (type: string, data: {
+export const messages = (type: string, data: {
   list?: Message[];
   conversationId?: string;
 }, state = defaultValues): MessageState => {

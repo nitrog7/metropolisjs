@@ -23,7 +23,7 @@ export type PostApiResultsType = {
     getPostsByTags: Post[];
     deletePost: Post;
     updatePost: Post;
-  }
+  };
 };
 
 export class PostActions {

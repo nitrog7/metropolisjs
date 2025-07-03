@@ -20,7 +20,7 @@ export const defaultValues: WebSocketState = {
   isOpen: false
 };
 
-export const websocketStore = (type: string, data: Partial<WebSocketState>, state = defaultValues): WebSocketState => {
+export const websocket = (type: string, data: Partial<WebSocketState>, state = defaultValues): WebSocketState => {
   switch(type) {
     case WebSocketConstants.CLOSE: {
       return {...state, isOpen: false};

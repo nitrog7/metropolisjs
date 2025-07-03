@@ -17,7 +17,7 @@ interface AppState {
 
 export const defaultValues: AppState = {};
 
-export const appStore = (type: string, data: Partial<AppState>, state = defaultValues): AppState => {
+export const app = (type: string, data: Partial<AppState>, state = defaultValues): AppState => {
   switch(type) {
     default: {
       return state;

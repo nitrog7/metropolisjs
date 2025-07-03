@@ -20,7 +20,7 @@ export const defaultValues: ReactionState = {
   reactions: {}
 };
 
-export const reactionStore = (type: string, data: Partial<ReactionState>, state = defaultValues): ReactionState => {
+export const reactions = (type: string, data: Partial<ReactionState>, state = defaultValues): ReactionState => {
   switch(type) {
     default: {
       return state;

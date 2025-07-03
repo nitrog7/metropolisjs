@@ -28,8 +28,8 @@ export class UserConstants {
   static readonly GET_LIST_SUCCESS: string = 'USER_GET_LIST_SUCCESS';
   static readonly GET_SESSION_ERROR: string = 'USER_GET_SESSION_ERROR';
   static readonly GET_SESSION_SUCCESS: string = 'USER_GET_SESSION_SUCCESS';
-  static readonly GET_USER_ERROR: string = 'USER_GET_USER_ERROR';
-  static readonly GET_USER_SUCCESS: string = 'USER_GET_USER_SUCCESS';
+  static readonly GET_ITEM_ERROR: string = 'USER_GET_ITEM_ERROR';
+  static readonly GET_ITEM_SUCCESS: string = 'USER_GET_ITEM_SUCCESS';
   static readonly HAS_USER_REACTIONS: string = 'USER_HAS_USER_REACTIONS';
   static readonly REMOVE_RELATION: string = 'USER_REMOVE_RELATION';
   static readonly RECOVERY_ERROR: string = 'USER_RECOVERY_ERROR';
@@ -44,15 +44,15 @@ export class UserConstants {
   static readonly SIGN_IN_SUCCESS: string = 'USER_SIGN_IN_SUCCESS';
   static readonly SIGN_OUT_ERROR: string = 'USER_SIGN_OUT_ERROR';
   static readonly SIGN_OUT_SUCCESS: string = 'USER_SIGN_OUT_SUCCESS';
-  static readonly UPDATE_ACCOUNT_ERROR: string = 'USER_UPDATE_ACCOUNT_ERROR';
-  static readonly UPDATE_ACCOUNT_SUCCESS: string = 'USER_UPDATE_ACCOUNT_SUCCESS';
+  static readonly UPDATE_ITEM_ERROR: string = 'USER_UPDATE_ITEM_ERROR';
+  static readonly UPDATE_ITEM_SUCCESS: string = 'USER_UPDATE_ITEM_SUCCESS';
   static readonly UPDATE_PERSONA_ERROR: string = 'USER_UPDATE_PERSONA_ERROR';
   static readonly UPDATE_PERSONA_SUCCESS: string = 'USER_UPDATE_PERSONA_SUCCESS';
   static readonly UPDATE_SESSION_ERROR: string = 'USER_UPDATE_SESSION_ERROR';
   static readonly UPDATE_SESSION_SUCCESS: string = 'USER_UPDATE_SESSION_SUCCESS';
   static readonly VERIFY_SUCCESS: string = 'USER_VERIFY_SUCCESS';
   static readonly VERIFY_ERROR: string = 'USER_VERIFY_ERROR';
-};
+}
 
 interface UserState {
   likes: string[];
@@ -84,7 +84,7 @@ interface UserData {
   readonly user?: User;
 }
 
-export const userStore = (type: string, data: UserData, state = defaultValues): UserState => {
+export const users = (type: string, data: UserData, state = defaultValues): UserState => {
   switch(type) {
     case ReactionConstants.ADD_ITEM_SUCCESS:
     case ReactionConstants.REMOVE_ITEM_SUCCESS: {
@@ -169,7 +169,7 @@ export const userStore = (type: string, data: UserData, state = defaultValues): 
       const {session} = data;
       return {...state, session: {...state.session, ...session}};
     }
-    case UserConstants.UPDATE_ACCOUNT_SUCCESS: {
+    case UserConstants.UPDATE_ITEM_SUCCESS: {
       const {user} = data;
       const {session, users} = state;
       return {...state, session: {...session, ...user.toJson()}, users: {...users, [user.userId]: user.toJson()}};

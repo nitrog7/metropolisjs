@@ -38,7 +38,7 @@ export interface UserApiResultsType {
     update?: Partial<User>;
     updatePassword?: Partial<boolean>;
     updatePersona?: Partial<Persona>;
-  }
+  };
 }
 
 export class UserActions {
@@ -251,7 +251,7 @@ export class UserActions {
 
       return user as User;
     } catch(error) {
-      this.flux.dispatch({error, type: UserConstants.GET_USER_ERROR});
+      this.flux.dispatch({error, type: UserConstants.GET_ITEM_ERROR});
       throw error;
     }
   }
@@ -726,13 +726,13 @@ export class UserActions {
       };
       const onSuccess = (data: ApiResultsType = {}) => {
         const {users: {updatePassword = {}}} = data as unknown as UserApiResultsType;
-        return this.flux.dispatch({value: !!updatePassword, type: UserConstants.UPDATE_ACCOUNT_SUCCESS});
+        return this.flux.dispatch({value: !!updatePassword, type: UserConstants.UPDATE_ITEM_SUCCESS});
       };
 
       const {value} = await publicMutation(this.flux, 'updatePassword', DATA_TYPE, queryVariables, null, {onSuccess});
       return value as boolean;
     } catch(error) {
-      this.flux.dispatch({error, type: UserConstants.UPDATE_ACCOUNT_ERROR});
+      this.flux.dispatch({error, type: UserConstants.UPDATE_ITEM_ERROR});
       return Promise.reject(error);
     }
   }
@@ -747,7 +747,10 @@ export class UserActions {
       };
       const onSuccess = (data: ApiResultsType = {}) => {
         const {users: {update = {}}} = data as unknown as UserApiResultsType;
-        return this.flux.dispatch({user: new this.CustomAdapter(update), type: UserConstants.UPDATE_ACCOUNT_SUCCESS});
+        return this.flux.dispatch({
+          user: new this.CustomAdapter(update).toJson(),
+          type: UserConstants.UPDATE_ITEM_SUCCESS
+        });
       };
 
       const {user} = await publicMutation(
@@ -780,7 +783,7 @@ export class UserActions {
       );
       return user as User;
     } catch(error) {
-      this.flux.dispatch({error, type: UserConstants.UPDATE_ACCOUNT_ERROR});
+      this.flux.dispatch({error, type: UserConstants.UPDATE_ITEM_ERROR});
       return Promise.reject(error);
     }
   }

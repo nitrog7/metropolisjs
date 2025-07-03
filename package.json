@@ -2,6 +2,7 @@
   "name": "@nlabs/metropolisjs",
   "version": "0.1.1",
   "description": "MetropolisJS is a library to connect users to Reaktor",
+  "type": "module",
   "main": "lib/index.js",
   "module": "./index.js",
   "browser": "./index.js",
@@ -11,8 +12,7 @@
     "clean": "lex clean",
     "dev": "lex dev --remove",
     "format": "npm run prettier && npm run lint",
-    "lint": "eslint ./src/**/**.ts* --fix",
-    "pretest": "npm run lint",
+    "lint": "lex lint --fix",
     "prettier": "prettier --write ./src",
     "production": "lex build",
     "publish:major": "npm version major && npm run publish:tags && npm publish",
@@ -52,14 +52,10 @@
   "devDependencies": {
     "@nlabs/arkhamjs": "*",
     "@nlabs/arkhamjs-utils-react": "*",
-    "@types/jest": "^29.5.14",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.13.8",
     "@types/react": "^19.0.10",
-    "eslint": "9.21.0",
-    "eslint-plugin-import": "2.31.0",
-    "jest": "^29.7.0",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.25.0"
+    "typescript": "^5.7.3"
   },
   "peerDependencies": {
     "@nlabs/arkhamjs": "^3.23.0",

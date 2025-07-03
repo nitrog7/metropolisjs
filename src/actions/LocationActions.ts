@@ -166,8 +166,8 @@ export class LocationActions {
     });
   }
 
-  async getGoogleLocation(address: string): Promise<{latitude: number, location: string, longitude: number}> {
-    const {key: googleKey, url: googleUrl} = Config.get('google.maps') as {key: string, url: string};
+  async getGoogleLocation(address: string): Promise<{latitude: number; location: string; longitude: number}> {
+    const {key: googleKey, url: googleUrl} = Config.get('google.maps') as {key: string; url: string};
     const formatAddress: string = encodeURI(address);
     const url: string = `${googleUrl}?address=${formatAddress}&key=${googleKey}`;
 

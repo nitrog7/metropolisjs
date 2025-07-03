@@ -19,7 +19,7 @@ export type ReactionApiResultsType = {
     deleteReaction: Reaction;
     getReactionCount: number;
     hasReaction: boolean;
-  }
+  };
 };
 
 export class ReactionActions {

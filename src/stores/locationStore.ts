@@ -26,7 +26,7 @@ export const defaultValues: LocationState = {
   current: null
 };
 
-export const locationStore = (type: string, data: {current?: Location}, state = defaultValues): LocationState => {
+export const locations = (type: string, data: {current?: Location}, state = defaultValues): LocationState => {
   switch(type) {
     case LocationConstants.SET_CURRENT: {
       const {current} = data;

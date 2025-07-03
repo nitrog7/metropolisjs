@@ -27,7 +27,7 @@ export const defaultValues: PostState = {
   viewed: {}
 };
 
-export const postStore = (type: string, data: {post?: Post}, state = defaultValues): PostState => {
+export const posts = (type: string, data: {post?: Post}, state = defaultValues): PostState => {
   switch(type) {
     case PostConstants.GET_ITEM_SUCCESS: {
       const {viewed} = state;

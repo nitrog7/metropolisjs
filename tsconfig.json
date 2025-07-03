@@ -37,7 +37,6 @@
     ]
   },
   "exclude": [
-    "**/*.test.*",
     "./lib",
     "./node_modules"
   ],

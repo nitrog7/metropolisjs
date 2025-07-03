@@ -26,7 +26,7 @@ export const defaultValues: ImageState = {
   lists: {}
 };
 
-export const imageStore = (type: string, data: {
+export const images = (type: string, data: {
   list?: Image[];
   itemId?: string;
 }, state = defaultValues): ImageState => {

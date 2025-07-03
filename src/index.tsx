@@ -8,15 +8,15 @@ import React, {useEffect, useState} from 'react';
 import {WebsocketActions} from './actions/WebsocketActions';
 import {Config, MetropolisConfiguration} from './config';
 import {
-  appStore,
-  eventStore,
-  imageStore,
-  locationStore,
-  messageStore,
-  postStore,
-  tagStore,
-  userStore,
-  websocketStore
+  app,
+  events,
+  images,
+  locations,
+  messages,
+  posts,
+  tags,
+  users,
+  websocket
 } from './stores';
 import {refreshSession} from './utils/api';
 import {MetropolisAdapters, MetropolisContext} from './utils/MetropolisProvider';
@@ -27,21 +27,20 @@ import type {ReactElement} from 'react';
 export {MetropolisConfiguration} from './config';
 export * from './adapters';
 export * from './actions';
-export * from './stores';
 export {useMetropolis} from './utils/useMetropolis';
 
 export const onInit = (flux: FluxFramework) => {
   try {
     flux.addStores([
-      appStore,
-      eventStore,
-      imageStore,
-      locationStore,
-      messageStore,
-      postStore,
-      tagStore,
-      userStore,
-      websocketStore
+      app,
+      events,
+      images,
+      locations,
+      messages,
+      posts,
+      tags,
+      users,
+      websocket
     ]);
     const token = flux.getState('user.session.token');
     console.log({token});
@@ -56,6 +55,8 @@ export const onInit = (flux: FluxFramework) => {
 };
 
 export * from './utils/api';
+export * from './stores';
+
 export interface MetropolisProps {
   readonly adapters?: MetropolisAdapters;
   readonly children?: React.ReactElement | React.ReactElement[];

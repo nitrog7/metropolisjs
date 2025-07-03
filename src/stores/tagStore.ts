@@ -31,7 +31,7 @@ export const defaultValues: TagState = {
   list: []
 };
 
-export const tagStore = (type: string, data: {tags?: TagState['list']}, state = defaultValues): TagState => {
+export const tags = (type: string, data: {tags?: TagState['list']}, state = defaultValues): TagState => {
   switch(type) {
     case TagConstants.GET_LIST_SUCCESS: {
       const {tags = []} = data;

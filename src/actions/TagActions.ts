@@ -19,7 +19,7 @@ export type TagApiResultsType = {
     deleteTagFromProfile: Tag;
     getTags: Tag[];
     updateTag: Tag;
-  }
+  };
 };
 
 export class TagActions {

@@ -99,7 +99,7 @@ export class Post extends Adapter {
 
     this.reactions = isArray(reactions) ? reactions : [];
 
-    this.tags = isArray(tags) ? tags.map(tag => new Tag(tag)) : [];
+    this.tags = isArray(tags) ? tags.map((tag) => new Tag(tag)) : [];
 
     if(!isUndefined(type)) {
       this.type = parseString(type);
