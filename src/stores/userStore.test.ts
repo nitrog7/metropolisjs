@@ -2,16 +2,21 @@
  * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import {UserConstants, users, defaultValues} from './userStore';
+import {defaultValues, USER_CONSTANTS, userStore} from './userStore';
 
 describe('userStore', () => {
   it('should listen for default', () => {
-    const updatedState = users('', {}, defaultValues);
+    const updatedState = userStore('', {}, defaultValues);
     return expect(updatedState).toBe(defaultValues);
   });
 
   it('should listen for ADD_ITEM_SUCCESS', () => {
-    const updatedState = users(UserConstants.ADD_ITEM_SUCCESS, {}, defaultValues);
-    return expect(updatedState).toBe(defaultValues);
+    const mockUser = {
+      userId: 'test-id',
+      toJson: () => ({userId: 'test-id', name: 'Test User'})
+    };
+    const updatedState = userStore(USER_CONSTANTS.ADD_ITEM_SUCCESS, {user: mockUser}, defaultValues);
+    expect(updatedState.users['test-id']).toEqual({userId: 'test-id', name: 'Test User', timestamp: expect.any(Number)});
+    expect(updatedState.session).toEqual(mockUser);
   });
 });

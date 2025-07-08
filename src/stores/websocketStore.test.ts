@@ -2,26 +2,26 @@
  * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import {websocket, defaultValues, WebSocketConstants} from './websocketStore';
+import {defaultValues, WEBSOCKET_CONSTANTS, websocketStore} from './websocketStore';
 
 describe('websocketStore', () => {
   it('should listen for default', () => {
-    const updatedState = websocket('', {}, defaultValues);
-    return expect(updatedState).toBe(defaultValues);
+    const updatedState = websocketStore('', {}, defaultValues);
+    return expect(updatedState).toEqual(defaultValues);
   });
 
   it('should listen for CLOSE', () => {
-    const updatedState = websocket(WebSocketConstants.CLOSE, {}, defaultValues);
-    return expect(updatedState).toBe(defaultValues);
+    const updatedState = websocketStore(WEBSOCKET_CONSTANTS.CLOSE, {}, defaultValues);
+    return expect(updatedState).toEqual({...defaultValues, isOpen: false});
   });
 
   it('should listen for OPEN', () => {
-    const updatedState = websocket(WebSocketConstants.OPEN, {}, defaultValues);
-    return expect(updatedState).toBe(defaultValues);
+    const updatedState = websocketStore(WEBSOCKET_CONSTANTS.OPEN, {}, defaultValues);
+    return expect(updatedState).toEqual({...defaultValues, isOpen: true});
   });
 
   it('should listen for MESSAGE', () => {
-    const updatedState = websocket(WebSocketConstants.MESSAGE, {}, defaultValues);
-    return expect(updatedState).toBe(defaultValues);
+    const updatedState = websocketStore(WEBSOCKET_CONSTANTS.MESSAGE, {data: {test: 'test'}}, defaultValues);
+    return expect(updatedState).toEqual({...defaultValues, data: {test: 'test'}});
   });
 });

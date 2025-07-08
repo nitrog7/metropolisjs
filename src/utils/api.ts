@@ -5,8 +5,8 @@ import upperFirst from 'lodash/upperFirst';
 import {DateTime} from 'luxon';
 
 import {Config} from '../config';
-import {AppConstants} from '../stores/appStore';
-import {UserConstants} from '../stores/userStore';
+import {APP_CONSTANTS} from '../stores/appStore';
+import {USER_CONSTANTS} from '../stores/userStore';
 
 import type {FluxAction, FluxFramework} from '@nlabs/arkhamjs';
 
@@ -69,7 +69,7 @@ export const getGraphql = async (
   const networkType: string = flux.getState('app.networkType');
 
   if(networkType === 'none') {
-    return flux.dispatch({retry, type: AppConstants.API_NETWORK_ERROR});
+    return flux.dispatch({retry, type: APP_CONSTANTS.API_NETWORK_ERROR});
   }
 
   const now: number = Date.now();
@@ -109,7 +109,7 @@ export const getGraphql = async (
   console.log('getGraphql::query', {query, token, url});
   return graphqlQuery(url, query, {token})
     .then(async (results) => {
-      await flux.dispatch({type: AppConstants.API_NETWORK_SUCCESS});
+      await flux.dispatch({type: APP_CONSTANTS.API_NETWORK_SUCCESS});
       console.log('GraphqlApi::results', results);
       return results;
     })
@@ -119,7 +119,7 @@ export const getGraphql = async (
 
       console.log({error});
       if(onSuccess && errors.includes('network_error')) {
-        await flux.dispatch({retry, type: AppConstants.API_NETWORK_ERROR});
+        await flux.dispatch({retry, type: APP_CONSTANTS.API_NETWORK_ERROR});
         return Promise.reject(error);
       } else if(errors.includes('invalid_session')) {
         await flux.clearAppData();
@@ -199,17 +199,17 @@ export const publicQuery = (
   return getGraphql(flux, publicUrl, false, query, options);
 };
 
-export const publicMutation = (
+export const publicMutation = <T>(
   flux: FluxFramework,
   name: string,
   dataType: ReaktorDbCollection,
   queryVariables: ApiQueryVariables,
   returnProperties: string[],
   options: ApiOptions = {}
-): Promise<ApiResultsType> => {
+): Promise<T> => {
   const query = createMutation(name, dataType, queryVariables, returnProperties);
   const publicUrl: string = Config.get('app.api.public');
-  return getGraphql(flux, publicUrl, false, query, options);
+  return getGraphql(flux, publicUrl, false, query, options) as Promise<T>;
 };
 
 export const uploadImage = (flux: FluxFramework, image, options: HunterOptionsType = {}): Promise<ApiResultsType> => {
@@ -240,14 +240,14 @@ export const refreshSession = async (flux: FluxFramework, token?: string, expire
     };
     const onSuccess = (data: ApiResultsType = {}): Promise<FluxAction> => {
       const {refreshSession: sessionData = {}} = data;
-      return flux.dispatch({session: sessionData, type: UserConstants.UPDATE_SESSION_SUCCESS});
+      return flux.dispatch({session: sessionData, type: USER_CONSTANTS.UPDATE_SESSION_SUCCESS});
     };
 
     return await publicMutation(flux, 'refreshSession', 'users', queryVariables, ['expires', 'issued', 'token'], {
       onSuccess
     });
   } catch(error) {
-    flux.dispatch({error, type: UserConstants.GET_SESSION_ERROR});
+    flux.dispatch({error, type: USER_CONSTANTS.GET_SESSION_ERROR});
     return null;
   }
 };

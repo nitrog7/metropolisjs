@@ -4,20 +4,20 @@
  */
 import type {MessageType} from '../adapters/messageAdapter';
 
-export class MessageConstants {
-  static readonly ADD_ITEM_ERROR: string = 'MESSAGE_ADD_ITEM_ERROR';
-  static readonly ADD_ITEM_SUCCESS: string = 'MESSAGE_ADD_ITEM_SUCCESS';
-  static readonly GET_CONVO_LIST_ERROR: string = 'MESSAGE_GET_CONVO_LIST_ERROR';
-  static readonly GET_CONVO_LIST_SUCCESS: string = 'MESSAGE_GET_CONVO_LIST_SUCCESS';
-  static readonly GET_ITEM_ERROR: string = 'MESSAGE_GET_ITEM_ERROR';
-  static readonly GET_ITEM_SUCCESS: string = 'MESSAGE_GET_ITEM_SUCCESS';
-  static readonly GET_LIST_ERROR: string = 'MESSAGE_GET_LIST_ERROR';
-  static readonly GET_LIST_SUCCESS: string = 'MESSAGE_GET_LIST_SUCCESS';
-  static readonly REMOVE_ITEM_ERROR: string = 'MESSAGE_REMOVE_ITEM_ERROR';
-  static readonly REMOVE_ITEM_SUCCESS: string = 'MESSAGE_REMOVE_ITEM_SUCCESS';
-  static readonly UPDATE_ITEM_ERROR: string = 'MESSAGE_UPDATE_ITEM_ERROR';
-  static readonly UPDATE_ITEM_SUCCESS: string = 'MESSAGE_UPDATE_ITEM_SUCCESS';
-}
+export const MESSAGE_CONSTANTS = {
+  ADD_ITEM_ERROR: 'MESSAGE_ADD_ITEM_ERROR',
+  ADD_ITEM_SUCCESS: 'MESSAGE_ADD_ITEM_SUCCESS',
+  GET_CONVO_LIST_ERROR: 'MESSAGE_GET_CONVO_LIST_ERROR',
+  GET_CONVO_LIST_SUCCESS: 'MESSAGE_GET_CONVO_LIST_SUCCESS',
+  GET_ITEM_ERROR: 'MESSAGE_GET_ITEM_ERROR',
+  GET_ITEM_SUCCESS: 'MESSAGE_GET_ITEM_SUCCESS',
+  GET_LIST_ERROR: 'MESSAGE_GET_LIST_ERROR',
+  GET_LIST_SUCCESS: 'MESSAGE_GET_LIST_SUCCESS',
+  REMOVE_ITEM_ERROR: 'MESSAGE_REMOVE_ITEM_ERROR',
+  REMOVE_ITEM_SUCCESS: 'MESSAGE_REMOVE_ITEM_SUCCESS',
+  UPDATE_ITEM_ERROR: 'MESSAGE_UPDATE_ITEM_ERROR',
+  UPDATE_ITEM_SUCCESS: 'MESSAGE_UPDATE_ITEM_SUCCESS'
+} as const;
 
 interface MessageState {
   conversations: Record<string, MessageType[]>;
@@ -27,12 +27,12 @@ export const defaultValues: MessageState = {
   conversations: {}
 };
 
-export const messages = (type: string, data: {
+export const messageStore = (type: string, data: {
   list?: MessageType[];
   conversationId?: string;
 }, state = defaultValues): MessageState => {
   switch(type) {
-    case MessageConstants.GET_CONVO_LIST_SUCCESS: {
+    case MESSAGE_CONSTANTS.GET_CONVO_LIST_SUCCESS: {
       const {list, conversationId} = data;
 
       if(!conversationId) {
@@ -51,4 +51,10 @@ export const messages = (type: string, data: {
       return state;
     }
   }
+};
+
+export const messages = {
+  action: messageStore,
+  name: 'message',
+  initialState: defaultValues
 };

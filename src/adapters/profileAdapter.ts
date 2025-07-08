@@ -69,7 +69,7 @@ export const validateProfileInput = (profile: unknown): ProfileType => {
     return validated as ProfileType;
   } catch(error) {
     if(error instanceof z.ZodError) {
-      const fieldErrors = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const fieldErrors = error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
       throw new ProfileValidationError(`Profile validation failed: ${fieldErrors}`);
     }
     throw error;

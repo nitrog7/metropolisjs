@@ -13,4 +13,4 @@ describe('Simple Adapter Test', () => {
     expect(testObj.name).toBe('test');
     expect(testObj.value).toBe(123);
   });
-}); 
+});

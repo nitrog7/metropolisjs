@@ -75,7 +75,7 @@ export const validatePostInput = (post: unknown): PostType => {
     return validated as PostType;
   } catch(error) {
     if(error instanceof z.ZodError) {
-      const fieldErrors = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const fieldErrors = error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
       throw new PostValidationError(`Post validation failed: ${fieldErrors}`);
     }
     throw error;

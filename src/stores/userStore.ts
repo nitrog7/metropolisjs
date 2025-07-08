@@ -7,58 +7,62 @@ import orderBy from 'lodash/orderBy';
 import pullAllBy from 'lodash/pullAllBy';
 import uniqBy from 'lodash/uniqBy';
 
-import {ReactionConstants} from './reactionStore';
-import {TagConstants} from './tagStore';
+import {REACTION_CONSTANTS} from './reactionStore';
+import {TAG_CONSTANTS} from './tagStore';
 
-import type {ReactionType, UserType} from '../adapters';
+import type {ReactionType, User} from '../adapters';
 import type {PersonaType} from '../adapters/personaAdapter';
 
-export class UserConstants {
-  static readonly ADD_ITEM_ERROR: string = 'USER_ADD_ITEM_ERROR';
-  static readonly ADD_ITEM_SUCCESS: string = 'USER_ADD_ITEM_SUCCESS';
-  static readonly ADD_RELATION_ERROR: string = 'USER_ADD_RELATION_ERROR';
-  static readonly ADD_RELATION_SUCCESS: string = 'USER_ADD_RELATION_SUCCESS';
-  static readonly AUTHENTICATION_UPDATE: string = 'USER_AUTHENTICATION_UPDATE';
-  static readonly CONFIRM_SIGN_UP_ERROR: string = 'USER_CONFIRM_SIGN_UP_ERROR';
-  static readonly CONFIRM_SIGN_UP_SUCCESS: string = 'USER_CONFIRM_SIGN_UP_SUCCESS';
-  static readonly FORGOT_PASSWORD_ERROR: string = 'USER_FORGOT_PASSWORD_ERROR';
-  static readonly FORGOT_PASSWORD_SUCCESS: string = 'USER_FORGOT_PASSWORD_SUCCESS';
-  static readonly GET_DETAILS_SUCCESS: string = 'USER_GET_DETAILS_SUCCESS';
-  static readonly GET_LIST_ERROR: string = 'USER_GET_LIST_ERROR';
-  static readonly GET_LIST_SUCCESS: string = 'USER_GET_LIST_SUCCESS';
-  static readonly GET_SESSION_ERROR: string = 'USER_GET_SESSION_ERROR';
-  static readonly GET_SESSION_SUCCESS: string = 'USER_GET_SESSION_SUCCESS';
-  static readonly GET_ITEM_ERROR: string = 'USER_GET_ITEM_ERROR';
-  static readonly GET_ITEM_SUCCESS: string = 'USER_GET_ITEM_SUCCESS';
-  static readonly HAS_USER_REACTIONS: string = 'USER_HAS_USER_REACTIONS';
-  static readonly REMOVE_RELATION: string = 'USER_REMOVE_RELATION';
-  static readonly RECOVERY_ERROR: string = 'USER_RECOVERY_ERROR';
-  static readonly RECOVERY_SUCCESS: string = 'USER_RECOVERY_SUCCESS';
-  static readonly REMOVE_ITEM_ERROR: string = 'USER_REMOVE_ITEM_ERROR';
-  static readonly REMOVE_ITEM_SUCCESS: string = 'USER_REMOVE_ITEM_SUCCESS';
-  static readonly RESEND_CODE_ERROR: string = 'USER_RESEND_CODE_ERROR';
-  static readonly RESEND_CODE_SUCCESS: string = 'USER_RESEND_CODE_SUCCESS';
-  static readonly RESET_PASSWORD_ERROR: string = 'USER_RESET_PASSWORD_ERROR';
-  static readonly RESET_PASSWORD_SUCCESS: string = 'USER_RESET_PASSWORD_SUCCESS';
-  static readonly SIGN_IN_ERROR: string = 'USER_SIGN_IN_ERROR';
-  static readonly SIGN_IN_SUCCESS: string = 'USER_SIGN_IN_SUCCESS';
-  static readonly SIGN_OUT_ERROR: string = 'USER_SIGN_OUT_ERROR';
-  static readonly SIGN_OUT_SUCCESS: string = 'USER_SIGN_OUT_SUCCESS';
-  static readonly UPDATE_ITEM_ERROR: string = 'USER_UPDATE_ITEM_ERROR';
-  static readonly UPDATE_ITEM_SUCCESS: string = 'USER_UPDATE_ITEM_SUCCESS';
-  static readonly UPDATE_PERSONA_ERROR: string = 'USER_UPDATE_PERSONA_ERROR';
-  static readonly UPDATE_PERSONA_SUCCESS: string = 'USER_UPDATE_PERSONA_SUCCESS';
-  static readonly UPDATE_SESSION_ERROR: string = 'USER_UPDATE_SESSION_ERROR';
-  static readonly UPDATE_SESSION_SUCCESS: string = 'USER_UPDATE_SESSION_SUCCESS';
-  static readonly VERIFY_SUCCESS: string = 'USER_VERIFY_SUCCESS';
-  static readonly VERIFY_ERROR: string = 'USER_VERIFY_ERROR';
-}
+export const USER_CONSTANTS = {
+  ADD_ITEM_ERROR: 'USER_ADD_ITEM_ERROR',
+  ADD_ITEM_SUCCESS: 'USER_ADD_ITEM_SUCCESS',
+  ADD_RELATION_ERROR: 'USER_ADD_RELATION_ERROR',
+  ADD_RELATION_SUCCESS: 'USER_ADD_RELATION_SUCCESS',
+  AUTHENTICATION_UPDATE: 'USER_AUTHENTICATION_UPDATE',
+  CONFIRM_SIGN_UP_ERROR: 'USER_CONFIRM_SIGN_UP_ERROR',
+  CONFIRM_SIGN_UP_SUCCESS: 'USER_CONFIRM_SIGN_UP_SUCCESS',
+  FORGOT_PASSWORD_ERROR: 'USER_FORGOT_PASSWORD_ERROR',
+  FORGOT_PASSWORD_SUCCESS: 'USER_FORGOT_PASSWORD_SUCCESS',
+  GET_DETAILS_SUCCESS: 'USER_GET_DETAILS_SUCCESS',
+  GET_LIST_ERROR: 'USER_GET_LIST_ERROR',
+  GET_LIST_SUCCESS: 'USER_GET_LIST_SUCCESS',
+  GET_SESSION_ERROR: 'USER_GET_SESSION_ERROR',
+  GET_SESSION_SUCCESS: 'USER_GET_SESSION_SUCCESS',
+  GET_ITEM_ERROR: 'USER_GET_ITEM_ERROR',
+  GET_ITEM_SUCCESS: 'USER_GET_ITEM_SUCCESS',
+  HAS_USER_REACTIONS: 'USER_HAS_USER_REACTIONS',
+  REMOVE_RELATION: 'USER_REMOVE_RELATION',
+  RECOVERY_ERROR: 'USER_RECOVERY_ERROR',
+  RECOVERY_SUCCESS: 'USER_RECOVERY_SUCCESS',
+  REMOVE_ITEM_ERROR: 'USER_REMOVE_ITEM_ERROR',
+  REMOVE_ITEM_SUCCESS: 'USER_REMOVE_ITEM_SUCCESS',
+  RESEND_CODE_ERROR: 'USER_RESEND_CODE_ERROR',
+  RESEND_CODE_SUCCESS: 'USER_RESEND_CODE_SUCCESS',
+  RESET_PASSWORD_ERROR: 'USER_RESET_PASSWORD_ERROR',
+  RESET_PASSWORD_SUCCESS: 'USER_RESET_PASSWORD_SUCCESS',
+  SIGN_IN_ERROR: 'USER_SIGN_IN_ERROR',
+  SIGN_IN_SUCCESS: 'USER_SIGN_IN_SUCCESS',
+  SIGN_OUT_ERROR: 'USER_SIGN_OUT_ERROR',
+  SIGN_OUT_SUCCESS: 'USER_SIGN_OUT_SUCCESS',
+  UPDATE_ITEM_ERROR: 'USER_UPDATE_ITEM_ERROR',
+  UPDATE_ITEM_SUCCESS: 'USER_UPDATE_ITEM_SUCCESS',
+  UPDATE_PERSONA_ERROR: 'USER_UPDATE_PERSONA_ERROR',
+  UPDATE_PERSONA_SUCCESS: 'USER_UPDATE_PERSONA_SUCCESS',
+  UPDATE_SESSION_ERROR: 'USER_UPDATE_SESSION_ERROR',
+  UPDATE_SESSION_SUCCESS: 'USER_UPDATE_SESSION_SUCCESS',
+  VERIFY_SUCCESS: 'USER_VERIFY_SUCCESS',
+  VERIFY_ERROR: 'USER_VERIFY_ERROR',
+  SIGN_UP_SUCCESS: 'USER_SIGN_UP_SUCCESS',
+  SIGN_UP_ERROR: 'USER_SIGN_UP_ERROR'
+} as const;
+
+export type UserConstantsType = typeof USER_CONSTANTS[keyof typeof USER_CONSTANTS];
 
 interface UserState {
   likes: string[];
   lists: Record<string, unknown>;
-  session: Partial<UserType>;
-  users: Record<string, Partial<UserType>>;
+  session: Partial<User>;
+  users: Record<string, Partial<User>>;
 }
 
 export const defaultValues: UserState = {
@@ -76,18 +80,18 @@ export const countFieldMap = {
 interface UserData {
   readonly itemId?: string;
   readonly itemType?: string;
-  readonly list?: UserType[];
+  readonly list?: User[];
   readonly persona?: PersonaType;
   readonly reaction?: ReactionType;
-  readonly session?: UserType;
+  readonly session?: User;
   readonly tag?: Record<string, unknown>;
-  readonly user?: UserType;
+  readonly user?: User;
 }
 
-export const users = (type: string, data: UserData, state = defaultValues): UserState => {
+export const userStore = (type: string, data: UserData, state = defaultValues): UserState => {
   switch(type) {
-    case ReactionConstants.ADD_ITEM_SUCCESS:
-    case ReactionConstants.REMOVE_ITEM_SUCCESS: {
+    case REACTION_CONSTANTS.ADD_ITEM_SUCCESS:
+    case REACTION_CONSTANTS.REMOVE_ITEM_SUCCESS: {
       const {itemId, itemType, reaction} = data;
 
       if(itemType !== 'users') {
@@ -108,11 +112,11 @@ export const users = (type: string, data: UserData, state = defaultValues): User
 
       return {...state, users};
     }
-    case UserConstants.UPDATE_SESSION_SUCCESS: {
+    case USER_CONSTANTS.UPDATE_SESSION_SUCCESS: {
       const {user} = data;
       return {...state, session: {...state.session, ...user}};
     }
-    case TagConstants.ADD_PROFILE_SUCCESS: {
+    case TAG_CONSTANTS.ADD_PROFILE_SUCCESS: {
       const {tag} = data;
       const {session = {}} = state;
       const {tags = []} = session;
@@ -120,61 +124,61 @@ export const users = (type: string, data: UserData, state = defaultValues): User
       session.tags = orderBy(updatedTags, 'name', 'asc');
       return {...state, session};
     }
-    case TagConstants.REMOVE_PROFILE_SUCCESS: {
+    case TAG_CONSTANTS.REMOVE_PROFILE_SUCCESS: {
       const {tag} = data;
       const {session = {}} = state;
       const {tags = []} = session;
       session.tags = pullAllBy(tags, [tag], 'tagId');
       return {...state, session};
     }
-    case UserConstants.ADD_ITEM_SUCCESS: {
+    case USER_CONSTANTS.ADD_ITEM_SUCCESS: {
       const {user} = data;
       const {users} = state;
       users[user.userId] = {...user.toJson(), timestamp: Date.now()};
       return {...state, users, session: user};
     }
-    case UserConstants.GET_DETAILS_SUCCESS: {
+    case USER_CONSTANTS.GET_DETAILS_SUCCESS: {
       const {user} = data;
       const {users} = state;
       users[user.userId] = {...user.toJson(), timestamp: Date.now()};
       return {...state, users};
     }
-    case UserConstants.GET_LIST_SUCCESS: {
+    case USER_CONSTANTS.GET_LIST_SUCCESS: {
       const {list} = data;
       const {users} = state;
 
-      list.forEach((user: UserType) => {
-        const cachedUser: Partial<UserType> = users[user.userId] || {};
+      list.forEach((user: User) => {
+        const cachedUser: Partial<User> = users[user.userId] || {};
         users[user.userId] = {...cachedUser, ...user.toJson()};
       });
       return {...state, users};
     }
-    case UserConstants.SIGN_IN_ERROR: {
+    case USER_CONSTANTS.SIGN_IN_ERROR: {
       const {username} = state.session;
       return {...state, session: {username}};
     }
-    case UserConstants.SIGN_IN_SUCCESS: {
+    case USER_CONSTANTS.SIGN_IN_SUCCESS: {
       const {session} = data;
       return {...state, lists: {}, session, users: {}};
     }
-    case UserConstants.RESEND_CODE_ERROR: {
+    case USER_CONSTANTS.RESEND_CODE_ERROR: {
       const {session} = data;
       return {...state, session: {...state.session, ...session.toJson()}};
     }
-    case UserConstants.RESEND_CODE_SUCCESS: {
+    case USER_CONSTANTS.RESEND_CODE_SUCCESS: {
       const {session} = data;
       return {...state, session: {...state.session, ...session.toJson()}};
     }
-    case UserConstants.GET_SESSION_SUCCESS: {
+    case USER_CONSTANTS.GET_SESSION_SUCCESS: {
       const {session} = data;
       return {...state, session: {...state.session, ...session}};
     }
-    case UserConstants.UPDATE_ITEM_SUCCESS: {
+    case USER_CONSTANTS.UPDATE_ITEM_SUCCESS: {
       const {user} = data;
       const {session, users} = state;
       return {...state, session: {...session, ...user.toJson()}, users: {...users, [user.userId]: user.toJson()}};
     }
-    case UserConstants.UPDATE_PERSONA_SUCCESS: {
+    case USER_CONSTANTS.UPDATE_PERSONA_SUCCESS: {
       const {persona} = data;
       const {session} = state;
       return {...state, session: {...session, ...persona.toJson()}};
@@ -183,4 +187,10 @@ export const users = (type: string, data: UserData, state = defaultValues): User
       return state;
     }
   }
+};
+
+export const users = {
+  action: userStore,
+  name: 'user',
+  initialState: defaultValues
 };

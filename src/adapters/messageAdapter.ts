@@ -58,7 +58,7 @@ export const validateMessageInput = (message: unknown): MessageType => {
     return validated as MessageType;
   } catch(error) {
     if(error instanceof z.ZodError) {
-      const fieldErrors = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const fieldErrors = error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
       throw new MessageValidationError(`Message validation failed: ${fieldErrors}`);
     }
     throw error;
@@ -93,11 +93,11 @@ const performMessageTransformation = (message: MessageType): MessageType => {
 
   const transformed = removeEmptyKeys({
     ...parseDocument(message),
+    ...((_id || id || _key || messageId) && {id: parseArangoId(_id || id || `messages/${_key || messageId}`)}),
+    ...((_key || messageId) && {messageId: parseId(_key || messageId)}),
     ...(content && {content}),
     ...(Array.isArray(files) && {files: files.map(parseFile)}),
     ...(Array.isArray(images) && {images: images.map(parseImage)}),
-    ...(_key && {messageId: parseId(_key)}),
-    ...((_id || id || _key || messageId) && {messageId: parseArangoId(_id || id || `messages/${_key || messageId}`)}),
     ...(saved !== undefined && {saved: !!saved})
   });
 

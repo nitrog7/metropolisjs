@@ -6,20 +6,20 @@ import {DateTime} from 'luxon';
 
 import type {TagType} from '../adapters/tagAdapter';
 
-export class TagConstants {
-  static readonly ADD_ITEM_ERROR: string = 'TAG_ADD_ITEM_ERROR';
-  static readonly ADD_ITEM_SUCCESS: string = 'TAG_ADD_ITEM_SUCCESS';
-  static readonly ADD_PROFILE_ERROR: string = 'TAG_ADD_PROFILE_ERROR';
-  static readonly ADD_PROFILE_SUCCESS: string = 'TAG_ADD_PROFILE_SUCCESS';
-  static readonly GET_LIST_ERROR: string = 'TAG_GET_LIST_ERROR';
-  static readonly GET_LIST_SUCCESS: string = 'TAG_GET_LIST_SUCCESS';
-  static readonly REMOVE_ITEM_ERROR: string = 'TAG_REMOVE_ITEM_ERROR';
-  static readonly REMOVE_ITEM_SUCCESS: string = 'TAG_REMOVE_ITEM_SUCCESS';
-  static readonly REMOVE_PROFILE_ERROR: string = 'TAG_REMOVE_PROFILE_ERROR';
-  static readonly REMOVE_PROFILE_SUCCESS: string = 'TAG_REMOVE_PROFILE_SUCCESS';
-  static readonly UPDATE_ITEM_ERROR: string = 'TAG_UPDATE_ITEM_ERROR';
-  static readonly UPDATE_ITEM_SUCCESS: string = 'TAG_UPDATE_ITEM_SUCCESS';
-}
+export const TAG_CONSTANTS = {
+  ADD_ITEM_ERROR: 'TAG_ADD_ITEM_ERROR',
+  ADD_ITEM_SUCCESS: 'TAG_ADD_ITEM_SUCCESS',
+  ADD_PROFILE_ERROR: 'TAG_ADD_PROFILE_ERROR',
+  ADD_PROFILE_SUCCESS: 'TAG_ADD_PROFILE_SUCCESS',
+  GET_LIST_ERROR: 'TAG_GET_LIST_ERROR',
+  GET_LIST_SUCCESS: 'TAG_GET_LIST_SUCCESS',
+  REMOVE_ITEM_ERROR: 'TAG_REMOVE_ITEM_ERROR',
+  REMOVE_ITEM_SUCCESS: 'TAG_REMOVE_ITEM_SUCCESS',
+  REMOVE_PROFILE_ERROR: 'TAG_REMOVE_PROFILE_ERROR',
+  REMOVE_PROFILE_SUCCESS: 'TAG_REMOVE_PROFILE_SUCCESS',
+  UPDATE_ITEM_ERROR: 'TAG_UPDATE_ITEM_ERROR',
+  UPDATE_ITEM_SUCCESS: 'TAG_UPDATE_ITEM_SUCCESS'
+} as const;
 
 interface TagState {
   expires: number;
@@ -31,9 +31,9 @@ export const defaultValues: TagState = {
   list: []
 };
 
-export const tags = (type: string, data: {tags?: TagState['list']}, state = defaultValues): TagState => {
+export const tagStore = (type: string, data: {tags?: TagState['list']}, state = defaultValues): TagState => {
   switch(type) {
-    case TagConstants.GET_LIST_SUCCESS: {
+    case TAG_CONSTANTS.GET_LIST_SUCCESS: {
       const {tags = []} = data;
       const expires: number = DateTime.local().plus({hours: 24}).toMillis();
       return {...state, expires, list: tags};
@@ -42,4 +42,10 @@ export const tags = (type: string, data: {tags?: TagState['list']}, state = defa
       return state;
     }
   }
+};
+
+export const tags = {
+  action: tagStore,
+  name: 'tag',
+  initialState: defaultValues
 };

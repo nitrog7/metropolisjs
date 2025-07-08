@@ -1,26 +1,9 @@
 {
-  "[javascript]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  },
-  "[javascriptreact]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  },
-  "[json]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-  },
   "cSpell.words": [
     "arkham",
     "arkhamjs",
     "nitrogenlabs",
     "nlabs",
-    "polyfill",
-    "starfire",
     "transpiler"
   ],
   "css.validate": false,
@@ -29,10 +12,21 @@
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "explicit"
   },
-  "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+  "prettier.enable": false,
+  "[javascript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
   "editor.detectIndentation": false,
   "editor.formatOnSave": true,
-  "editor.formatOnType": true,
   "editor.rulers": [
     120
   ],
@@ -48,13 +42,7 @@
     "postcss": "css"
   },
   "eslint.enable": true,
-  "eslint.experimental.useFlatConfig": true,
-  "eslint.format.enable": true,
-  "eslint.nodePath": "node_modules/@nlabs/lex/node_modules",
-  "eslint.options": {
-    "overrideConfigFile": "node_modules/@nlabs/lex/eslint.config.js"
-  },
-  "eslint.run": "onSave",
+  "eslint.run": "onType",
   "eslint.validate": [
     "javascript",
     "javascriptreact",
@@ -62,31 +50,33 @@
     "typescriptreact"
   ],
   "eslint.workingDirectories": [
-    {
-      "mode": "auto"
-    }
+    "."
   ],
+  "eslint.options": {
+    "overrideConfigFile": "node_modules/@nlabs/lex/eslint.config.js"
+  },
+  "eslint.format.enable": true,
+  "eslint.lintTask.enable": true,
+  "eslint.experimental.useFlatConfig": true,
   "explorer.confirmDragAndDrop": false,
   "explorer.decorations.badges": false,
-  "files.trimTrailingWhitespace": false,
+  "files.autoSave": "onFocusChange",
+  "files.trimTrailingWhitespace": true,
+  "html.autoClosingTags": false,
   "html.format.enable": false,
   "html.format.extraLiners": "",
   "html.format.indentHandlebars": true,
   "html.format.indentInnerHtml": true,
-  "javascript.format.enable": true,
+  "html.suggest.html5": false,
   "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
   "javascript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
   "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
-  "javascript.validate.enable": true,
-  "jest.disabledWorkspaceFolders": [
-    "execa-mock",
-    "favicons-webpack-plugin"
-  ],
-  "jest.jestCommandLine": "jest",
-  "jest.rootPath": "./",
-  "prettier.enable": false,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": false,
+  "javascript.updateImportsOnFileMove.enabled": "never",
   "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
   "typescript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
   "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": false,
+  "typescript.updateImportsOnFileMove.enabled": "never",
+  "window.zoomLevel": 0,
 }

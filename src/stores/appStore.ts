@@ -3,10 +3,10 @@
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
 
-export class AppConstants {
-  static readonly API_NETWORK_ERROR: string = 'APP_API_NETWORK_ERROR';
-  static readonly API_NETWORK_SUCCESS: string = 'APP_API_NETWORK_SUCCESS';
-}
+export const APP_CONSTANTS = {
+  API_NETWORK_ERROR: 'APP_API_NETWORK_ERROR',
+  API_NETWORK_SUCCESS: 'APP_API_NETWORK_SUCCESS'
+} as const;
 
 interface AppState {
   network?: {
@@ -17,10 +17,16 @@ interface AppState {
 
 export const defaultValues: AppState = {};
 
-export const app = (type: string, data: Partial<AppState>, state = defaultValues): AppState => {
+export const appStore = (type: string, data: Partial<AppState>, state = defaultValues): AppState => {
   switch(type) {
     default: {
       return state;
     }
   }
+};
+
+export const app = {
+  action: appStore,
+  name: 'app',
+  initialState: defaultValues
 };

@@ -5,7 +5,7 @@ import {parseDocument, removeEmptyKeys} from './arangoAdapter';
 import {parseReaktorDate, parseReaktorItemId, parseReaktorName, parseReaktorType} from './reaktorAdapter';
 import {parseTag} from './tagAdapter';
 
-export interface UserType {
+export interface User {
   _id?: string;
   _key?: string;
   active?: boolean;
@@ -143,27 +143,27 @@ const validateGender = (gender?: string): string | undefined => {
   return upper;
 };
 
-const userCache = new Map<string, UserType>();
+const userCache = new Map<string, User>();
 
-export const validateUserInput = (user: unknown): UserType => {
+export const validateUserInput = (user: unknown): User => {
   try {
     const validated = UserInputSchema.parse(user);
-    return validated as UserType;
+    return validated as User;
   } catch(error) {
     if(error instanceof z.ZodError) {
-      const fieldErrors = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const fieldErrors = error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
       throw new UserValidationError(`User validation failed: ${fieldErrors}`);
     }
     throw error;
   }
 };
 
-export const formatUserOutput = (user: UserType): UserType => {
+export const formatUserOutput = (user: User): User => {
   const {password, salt, verifiedEmailCode, verifiedSmsCode, ...safeUser} = user;
   return safeUser;
 };
 
-export const parseUser = (user: UserType): UserType => {
+export const parseUser = (user: User): User => {
   try {
     const parsed = performUserTransformation(user);
     return parsed;
@@ -175,7 +175,7 @@ export const parseUser = (user: UserType): UserType => {
   }
 };
 
-const performUserTransformation = (user: UserType): UserType => {
+const performUserTransformation = (user: User): User => {
   const {
     _id,
     _key,
@@ -220,6 +220,8 @@ const performUserTransformation = (user: UserType): UserType => {
   } = user;
   const transformed = {
     ...parseDocument(user),
+    ...((_id || id || _key || userId) && {id: parseArangoId(_id || id || `users/${_key || userId}`)}),
+    ...((_key || userId) && {userId: parseId(_key || userId)}),
     ...(active !== undefined && {active: !!active}),
     ...(bankId && {bankId: parseVarChar(bankId, 160)}),
     ...(city && {city: parseVarChar(city, 160)}),
@@ -230,7 +232,6 @@ const performUserTransformation = (user: UserType): UserType => {
     ...(email && {email: parseEmail(email)}),
     ...(first && {first: parseVarChar(first, 160)}),
     ...(gender && {gender: validateGender(gender)}),
-    ...((id || _id || _key || userId) && {id: parseArangoId(id || _id || `users/${_key || userId}`)}),
     ...(imageId && {imageId: parseReaktorItemId(imageId)}),
     ...(last && {last: parseVarChar(last, 160)}),
     ...(lastActive !== undefined && {lastActive: parseReaktorDate(lastActive)}),
@@ -249,7 +250,6 @@ const performUserTransformation = (user: UserType): UserType => {
     ...(timezone && {timezone: parseString(timezone, 160)}),
     ...(type && {type: parseReaktorType(type)}),
     ...(userAccess !== undefined && {userAccess: userAccess ? parseNum(userAccess) : 0}),
-    ...((userId || _key) && {userId: parseId(_key || userId)}),
     ...(username && {username: parseVarChar(username, 160)}),
     ...(verifiedEmail !== undefined && {verifiedEmail: !!verifiedEmail}),
     ...(verifiedEmailCode !== undefined && {verifiedEmailCode: parseNum(verifiedEmailCode, 10)}),
@@ -297,4 +297,4 @@ export const getUserCacheSize = (): number => userCache.size;
 
 export {userCache};
 
-export const parseUserLegacy = (user: UserType): UserType => parseUser(user);
+export const parseUserLegacy = (user: User): User => parseUser(user);

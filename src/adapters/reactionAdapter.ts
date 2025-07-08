@@ -34,6 +34,7 @@ const ReactionInputSchema = z.object({
   id: z.string().optional(),
   name: z.string().max(32).optional(),
   reactionId: z.string().optional(),
+  type: z.string(),
   value: z.string().max(32).optional()
 }).passthrough();
 
@@ -43,7 +44,7 @@ export const validateReactionInput = (reaction: unknown): ReactionType => {
     return validated as ReactionType;
   } catch(error) {
     if(error instanceof z.ZodError) {
-      const fieldErrors = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const fieldErrors = error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
       throw new ReactionValidationError(`Reaction validation failed: ${fieldErrors}`);
     }
     throw error;

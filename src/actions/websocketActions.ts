@@ -1,0 +1,107 @@
+/**
+ * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
+ * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
+ */
+import Sockette from 'sockette';
+
+import {Config} from '../config';
+import {WEBSOCKET_CONSTANTS} from '../stores/websocketStore';
+
+import type {FluxFramework} from '@nlabs/arkhamjs';
+
+interface WebSocketMessage {
+  type: string;
+  payload?: Record<string, unknown>;
+}
+
+export interface WebsocketActions {
+  wsSend: (message: WebSocketMessage) => void;
+  onReceive: (event: any) => void;
+  onClose: (event: any) => void;
+  onError: (event: any) => void;
+  onOpen: (event: any) => void;
+  wsInit: (token?: string) => Sockette | null;
+}
+
+/**
+ * Factory function to create WebsocketActions.
+ *
+ * @example
+ * // Basic usage
+ * const websocketActions = createWebsocketActions(flux);
+ *
+ * @example
+ * // Initialize websocket connection
+ * const ws = websocketActions.wsInit(token);
+ */
+export const createWebsocketActions = (flux: FluxFramework): WebsocketActions => {
+  let ws: Sockette;
+
+  const wsSend = (message: WebSocketMessage) => {
+    console.log('websockets::onOpen::message', {ws, message});
+    if(ws) {
+      ws.json(message);
+    }
+  };
+
+  const onReceive = (event: any) => {
+    const {data: eventData, timeStamp: timestamp} = event;
+    const data = JSON.parse(eventData);
+    console.log('websockets::onRecieve::data', data);
+    flux.dispatch({data, timestamp, type: WEBSOCKET_CONSTANTS.MESSAGE});
+  };
+
+  const onClose = (event: any) => {
+    console.log('websockets::onOpen::message', event);
+    const {timeStamp: timestamp} = event;
+    flux.dispatch({timestamp, type: WEBSOCKET_CONSTANTS.CLOSE});
+  };
+
+  const onError = (event: any) => {
+    const {timeStamp: timestamp} = event;
+    flux.dispatch({timestamp, type: WEBSOCKET_CONSTANTS.ERROR});
+  };
+
+  const onOpen = (event: any) => {
+    console.log('websockets::onOpen::event', event);
+    const {timeStamp: timestamp} = event;
+    flux.dispatch({timestamp, type: WEBSOCKET_CONSTANTS.OPEN});
+  };
+
+  const wsInit = (token?: string): Sockette | null => {
+    if(ws) {
+      return ws;
+    }
+
+    const websocketUrl: string = Config.get('app.urls.websocket');
+    const sessionToken: string = token || flux.getState('user.session.token');
+
+    if(sessionToken) {
+      const url: string = `${websocketUrl}?token=${sessionToken}`;
+
+      ws = new Sockette(url, {
+        maxAttempts: 5,
+        onclose: onClose,
+        onerror: onError,
+        onmessage: onReceive,
+        onopen: onOpen,
+        timeout: 60000
+      });
+
+      return ws;
+    }
+
+    return null;
+  };
+
+  // Return the actions object
+  return {
+    wsSend,
+    onReceive,
+    onClose,
+    onError,
+    onOpen,
+    wsInit
+  };
+};
+

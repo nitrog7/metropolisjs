@@ -50,7 +50,7 @@ export const validateSessionInput = (session: unknown): SessionType => {
     return validated as SessionType;
   } catch(error) {
     if(error instanceof z.ZodError) {
-      const fieldErrors = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const fieldErrors = error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
       throw new SessionValidationError(`Session validation failed: ${fieldErrors}`);
     }
     throw error;

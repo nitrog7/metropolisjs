@@ -4,19 +4,19 @@
  */
 import type {ImageType} from '../adapters/imageAdapter';
 
-export class ImageConstants {
-  static readonly ADD_ITEM_ERROR: string = 'IMAGE_ADD_ITEM_ERROR';
-  static readonly ADD_ITEM_SUCCESS: string = 'IMAGE_ADD_ITEM_SUCCESS';
-  static readonly GET_COUNT_ERROR: string = 'IMAGE_GET_COUNT_ERROR';
-  static readonly GET_COUNT_SUCCESS: string = 'IMAGE_GET_COUNT_SUCCESS';
-  static readonly GET_LIST_ERROR: string = 'IMAGE_GET_LIST_ERROR';
-  static readonly GET_LIST_SUCCESS: string = 'IMAGE_GET_LIST_SUCCESS';
-  static readonly OPEN: string = 'IMAGE_OPEN';
-  static readonly REMOVE_ITEM_ERROR: string = 'IMAGE_REMOVE_ITEM_ERROR';
-  static readonly REMOVE_ITEM_SUCCESS: string = 'IMAGE_REMOVE_ITEM_SUCCESS';
-  static readonly UPLOAD_ITEM_ERROR: string = 'IMAGE_UPLOAD_ITEM_ERROR';
-  static readonly UPLOAD_ITEM_SUCCESS: string = 'IMAGE_UPLOAD_ITEM_SUCCESS';
-}
+export const IMAGE_CONSTANTS = {
+  ADD_ITEM_ERROR: 'IMAGE_ADD_ITEM_ERROR',
+  ADD_ITEM_SUCCESS: 'IMAGE_ADD_ITEM_SUCCESS',
+  GET_COUNT_ERROR: 'IMAGE_GET_COUNT_ERROR',
+  GET_COUNT_SUCCESS: 'IMAGE_GET_COUNT_SUCCESS',
+  GET_LIST_ERROR: 'IMAGE_GET_LIST_ERROR',
+  GET_LIST_SUCCESS: 'IMAGE_GET_LIST_SUCCESS',
+  OPEN: 'IMAGE_OPEN',
+  REMOVE_ITEM_ERROR: 'IMAGE_REMOVE_ITEM_ERROR',
+  REMOVE_ITEM_SUCCESS: 'IMAGE_REMOVE_ITEM_SUCCESS',
+  UPLOAD_ITEM_ERROR: 'IMAGE_UPLOAD_ITEM_ERROR',
+  UPLOAD_ITEM_SUCCESS: 'IMAGE_UPLOAD_ITEM_SUCCESS'
+} as const;
 
 interface ImageState {
   lists: Record<string, ImageType[]>;
@@ -26,13 +26,18 @@ export const defaultValues: ImageState = {
   lists: {}
 };
 
-export const images = (type: string, data: {
+export const imageStore = (type: string, data: {
   list?: ImageType[];
   itemId?: string;
 }, state = defaultValues): ImageState => {
   switch(type) {
-    case ImageConstants.GET_LIST_SUCCESS: {
+    case IMAGE_CONSTANTS.GET_LIST_SUCCESS: {
       const {list, itemId} = data;
+
+      if(!itemId) {
+        return state;
+      }
+
       const {lists} = state;
       return {...state, lists: {...lists, [itemId]: list}};
     }
@@ -40,4 +45,10 @@ export const images = (type: string, data: {
       return state;
     }
   }
+};
+
+export const images = {
+  action: imageStore,
+  name: 'image',
+  initialState: defaultValues
 };

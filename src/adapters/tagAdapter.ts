@@ -42,7 +42,7 @@ export const validateTagInput = (tag: unknown): TagType => {
     return validated as TagType;
   } catch(error) {
     if(error instanceof z.ZodError) {
-      const fieldErrors = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const fieldErrors = error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
       throw new TagValidationError(`Tag validation failed: ${fieldErrors}`);
     }
     throw error;

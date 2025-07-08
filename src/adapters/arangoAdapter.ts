@@ -39,7 +39,7 @@ export const validateDocumentInput = (doc: unknown): DocumentType => {
     return validated as DocumentType;
   } catch(error) {
     if(error instanceof z.ZodError) {
-      const fieldErrors = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const fieldErrors = error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
       throw new ArangoValidationError(`Document validation failed: ${fieldErrors}`);
     }
     throw error;
@@ -71,10 +71,9 @@ const performDocumentTransformation = (doc: DocumentType): DocumentType => {
 
   const transformed = removeEmptyKeys({
     ...doc,
-    ...(_id && {_id: parseArangoId(_id)}),
+    ...((_id || id) && {id: parseArangoId(_id || id)}),
     ...(_key && {_key: parseId(_key)}),
     ...(added !== undefined && {added: parseNum(added, 13)}),
-    ...((_id || id) && {id: parseArangoId(_id || id)}),
     ...(modified !== undefined && {modified: parseNum(modified, 13)})
   });
 

@@ -4,18 +4,18 @@
  */
 import type {PostType} from '../adapters/postAdapter';
 
-export class PostConstants {
-  static readonly ADD_ITEM_ERROR: string = 'POST_ADD_ITEM_ERROR';
-  static readonly ADD_ITEM_SUCCESS: string = 'POST_ADD_ITEM_SUCCESS';
-  static readonly GET_ITEM_ERROR: string = 'POST_GET_ITEM_ERROR';
-  static readonly GET_ITEM_SUCCESS: string = 'POST_GET_ITEM_SUCCESS';
-  static readonly GET_LIST_ERROR: string = 'POST_GET_LIST_ERROR';
-  static readonly GET_LIST_SUCCESS: string = 'POST_GET_LIST_SUCCESS';
-  static readonly REMOVE_ITEM_ERROR: string = 'POST_REMOVE_ITEM_ERROR';
-  static readonly REMOVE_ITEM_SUCCESS: string = 'POST_REMOVE_ITEM_SUCCESS';
-  static readonly UPDATE_ITEM_ERROR: string = 'POST_UPDATE_ITEM_ERROR';
-  static readonly UPDATE_ITEM_SUCCESS: string = 'POST_UPDATE_ITEM_SUCCESS';
-}
+export const POST_CONSTANTS = {
+  ADD_ITEM_ERROR: 'POST_ADD_ITEM_ERROR',
+  ADD_ITEM_SUCCESS: 'POST_ADD_ITEM_SUCCESS',
+  GET_ITEM_ERROR: 'POST_GET_ITEM_ERROR',
+  GET_ITEM_SUCCESS: 'POST_GET_ITEM_SUCCESS',
+  GET_LIST_ERROR: 'POST_GET_LIST_ERROR',
+  GET_LIST_SUCCESS: 'POST_GET_LIST_SUCCESS',
+  REMOVE_ITEM_ERROR: 'POST_REMOVE_ITEM_ERROR',
+  REMOVE_ITEM_SUCCESS: 'POST_REMOVE_ITEM_SUCCESS',
+  UPDATE_ITEM_ERROR: 'POST_UPDATE_ITEM_ERROR',
+  UPDATE_ITEM_SUCCESS: 'POST_UPDATE_ITEM_SUCCESS'
+} as const;
 
 interface PostState {
   lists: Record<string, PostType[]>;
@@ -27,9 +27,9 @@ export const defaultValues: PostState = {
   viewed: {}
 };
 
-export const posts = (type: string, data: {post?: PostType}, state = defaultValues): PostState => {
+export const postStore = (type: string, data: {post?: PostType}, state = defaultValues): PostState => {
   switch(type) {
-    case PostConstants.GET_ITEM_SUCCESS: {
+    case POST_CONSTANTS.GET_ITEM_SUCCESS: {
       const {viewed} = state;
       const {post} = data;
       viewed[post.postId] = {...post, cached: Date.now()} as PostType;
@@ -39,4 +39,10 @@ export const posts = (type: string, data: {post?: PostType}, state = defaultValu
       return state;
     }
   }
+};
+
+export const posts = {
+  action: postStore,
+  name: 'post',
+  initialState: defaultValues
 };

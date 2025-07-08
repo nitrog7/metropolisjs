@@ -89,7 +89,7 @@ export const validateEventInput = (event: unknown): EventType => {
     return validated as EventType;
   } catch(error) {
     if(error instanceof z.ZodError) {
-      const fieldErrors = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const fieldErrors = error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
       throw new EventValidationError(`Event validation failed: ${fieldErrors}`);
     }
     throw error;

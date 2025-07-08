@@ -16,8 +16,8 @@
       "es7",
       "esnext"
     ],
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noUnusedLocals": false,

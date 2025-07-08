@@ -11,15 +11,19 @@ MetropolisJS is the bridge that connects your frontend dreams to backend reality
 ## 🚀 Why MetropolisJS?
 
 ### ✨ **Seamless Integration**
+
 Connect your React frontend to Reaktor-powered backend services with zero configuration headaches. MetropolisJS handles all the complex data flow, state management, and real-time communication.
 
 ### 🔄 **Real-Time Everything**
+
 Built-in WebSocket and Server-Sent Events (SSE) support for instant messaging, live notifications, and real-time data synchronization. Your users will never miss a beat.
 
 ### 🛡️ **Type-Safe & Reliable**
+
 Full TypeScript support with comprehensive type definitions. Catch errors at compile time, not runtime.
 
 ### 🎯 **Developer Experience First**
+
 Clean, intuitive APIs that make complex operations feel simple. Focus on building features, not boilerplate.
 
 ## 🎯 What Can You Build?
@@ -169,32 +173,33 @@ MetropolisJS is built on a powerful three-layer architecture:
 
 MetropolisJS provides comprehensive action classes for all your needs:
 
-- **UserActions**: Authentication, profiles, user management
-- **MessageActions**: Real-time messaging and conversations
-- **PostActions**: Social media posts and content
-- **ReactionActions**: Likes, reactions, and interactions
-- **TagActions**: Content categorization and discovery
-- **EventActions**: Event management and scheduling
-- **ImageActions**: Media upload and management
-- **LocationActions**: Geolocation and location-based features
-- **WebsocketActions**: Real-time communication setup
+- **userActions**: Authentication, profiles, user management
+- **messageActions**: Real-time messaging and conversations
+- **postActions**: Social media posts and content
+- **reactionActions**: Likes, reactions, and interactions
+- **tagActions**: Content categorization and discovery
+- **eventActions**: Event management and scheduling
+- **imageActions**: Media upload and management
+- **locationActions**: Geolocation and location-based features
+- **websocketActions**: Real-time communication setup
 
 ## 🔌 Adapters
 
 Customize data transformation with powerful adapters:
 
-- **User**: User profiles and authentication data
-- **Message**: Chat and messaging data
-- **Post**: Social media content
-- **Event**: Event and scheduling data
-- **Image**: Media and file data
-- **Location**: Geolocation data
-- **Tag**: Categorization data
-- **Reaction**: User interaction data
+- **userAdapter**: User profiles and authentication data
+- **messageAdapter**: Chat and messaging data
+- **postAdapter**: Social media content
+- **eventAdapter**: Event and scheduling data
+- **imageAdapter**: Media and file data
+- **locationAdapter**: Geolocation data
+- **tagAdapter**: Categorization data
+- **reactionAdapter**: User interaction data
 
 ## ⚡ Real-Time Features
 
 ### WebSocket Integration
+
 ```tsx
 const {websocketActions} = useMetropolis();
 
@@ -206,11 +211,13 @@ websocketActions.wsInit();
 ```
 
 ### Server-Sent Events
+
 Built-in SSE support for lightweight real-time updates without the overhead of WebSocket connections.
 
 ## 🎨 Customization
 
 ### Custom Adapters
+
 ```tsx
 class CustomUserAdapter extends User {
   // Override methods to customize data transformation
@@ -233,6 +240,7 @@ const {userActions} = useMetropolis({
 ```
 
 ### Configuration
+
 ```tsx
 const config = {
   environment: 'production',
@@ -268,11 +276,13 @@ const config = {
 ## 📦 Installation & Setup
 
 ### Prerequisites
+
 - Node.js 16+
 - React 18+
 - TypeScript 4.5+
 
 ### Full Installation
+
 ```bash
 # Install MetropolisJS and dependencies
 npm install @nlabs/metropolisjs @nlabs/arkhamjs @nlabs/arkhamjs-utils-react
@@ -282,6 +292,7 @@ npm install --save-dev @types/react @types/node
 ```
 
 ### Environment Setup
+
 ```bash
 # Set your environment variables
 export NODE_ENV=development
@@ -307,7 +318,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Documentation**: [Coming Soon]
 - **Issues**: [GitHub Issues](https://github.com/nitrogenlabs/metropolisjs/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/nitrogenlabs/metropolisjs/discussions)
-- **Email**: giraldo@nitrogenlabs.com
+- **Email**: <giraldo@nitrogenlabs.com>
 
 ## 🏢 About Nitrogen Labs
 

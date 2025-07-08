@@ -41,6 +41,7 @@ const ConversationInputSchema = z.object({
   isDirect: z.boolean().optional(),
   modified: z.number().optional(),
   name: z.string().max(160).optional(),
+  type: z.string(),
   users: z.array(z.any()).optional()
 }).passthrough();
 
@@ -50,7 +51,7 @@ export const validateConversationInput = (conversation: unknown): ConversationTy
     return validated as ConversationType;
   } catch(error) {
     if(error instanceof z.ZodError) {
-      const fieldErrors = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const fieldErrors = error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
       throw new ConversationValidationError(`Conversation validation failed: ${fieldErrors}`);
     }
     throw error;

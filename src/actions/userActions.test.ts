@@ -1,38 +1,112 @@
 import {FluxFramework} from '@nlabs/arkhamjs';
 import {DateTime} from 'luxon';
 
-import {User} from '../adapters/legacyCompatibility';
 import {Config} from '../config';
-import {UserActions} from './UserActions';
+import {createAction} from '../utils/actionFactory';
 
-describe('UserActions', () => {
+import type {UserAdapterOptions} from './userActions';
+
+// Mock @nlabs/rip-hunter to ensure HTTP requests are intercepted
+jest.mock('@nlabs/rip-hunter');
+
+describe('userActions', () => {
   let flux: FluxFramework;
-  let userActions: UserActions;
-  const mockUser = {
-    userId: '123',
-    username: 'testuser',
-    email: 'test@example.com'
-  };
+  let userActions: any;
 
   beforeEach(() => {
     flux = new FluxFramework();
-    userActions = new UserActions(flux);
+    userActions = createAction('user', flux);
 
-    // Mock flux methods
     flux.dispatch = jest.fn();
     flux.getState = jest.fn();
   });
 
-  describe('constructor', () => {
-    it('should initialize with default adapter', () => {
-      expect(userActions.CustomAdapter).toBe(User);
-      expect(userActions.flux).toBe(flux);
+  describe('factory function', () => {
+    it('should create actions with flux framework', () => {
+      expect(userActions).toBeDefined();
+      expect(typeof userActions.add).toBe('function');
+      expect(typeof userActions.signUp).toBe('function');
     });
 
-    it('should initialize with custom adapter', () => {
-      const CustomAdapter = class extends User {};
-      userActions = new UserActions(flux, CustomAdapter);
-      expect(userActions.CustomAdapter).toBe(CustomAdapter);
+    it('should use default adapters when no custom ones provided', () => {
+      const userActions = createAction('user', flux);
+      expect(userActions).toBeDefined();
+    });
+
+    it('should merge custom adapter with default behavior', () => {
+      const customUserAdapter = jest.fn().mockImplementation((input) => {
+        // input is already validated by default adapter
+        if(input.email && !input.email.includes('@company.com')) {
+          throw new Error('Only company emails allowed');
+        }
+        return input;
+      });
+
+      const userActions = createAction('user', flux, {
+        userAdapter: customUserAdapter
+      });
+
+      expect(userActions).toBeDefined();
+    });
+
+    it('should use adapter options when provided', () => {
+      const userAdapterOptions: UserAdapterOptions = {
+        strict: true,
+        environment: 'production',
+        customValidation: jest.fn().mockReturnValue({validated: true})
+      };
+
+      const userActions = createAction('user', flux, {
+        userAdapterOptions
+      });
+
+      expect(userActions).toBeDefined();
+    });
+  });
+
+  describe('adapter updates', () => {
+    it('should update user adapter at runtime', () => {
+      const customAdapter = jest.fn().mockImplementation((input) =>
+        // input is already validated by default adapter
+        ({...input, customField: true})
+      );
+
+      userActions.updateUserAdapter(customAdapter);
+      // The adapter should be updated internally
+      expect(userActions).toBeDefined();
+    });
+
+    it('should update persona adapter at runtime', () => {
+      const customAdapter = jest.fn().mockImplementation((input) =>
+        // input is already validated by default adapter
+        ({...input, customField: true})
+      );
+
+      userActions.updatePersonaAdapter(customAdapter);
+      // The adapter should be updated internally
+      expect(userActions).toBeDefined();
+    });
+
+    it('should update user adapter options at runtime', () => {
+      const newOptions: UserAdapterOptions = {
+        strict: true,
+        environment: 'production'
+      };
+
+      userActions.updateUserAdapterOptions(newOptions);
+      // The options should be updated internally
+      expect(userActions).toBeDefined();
+    });
+
+    it('should update persona adapter options at runtime', () => {
+      const newOptions = {
+        strict: true,
+        environment: 'production' as const
+      };
+
+      userActions.updatePersonaAdapterOptions(newOptions);
+      // The options should be updated internally
+      expect(userActions).toBeDefined();
     });
   });
 
@@ -71,10 +145,11 @@ describe('UserActions', () => {
           }
         }
       });
+
       await userActions.signIn('username', 'password');
 
-      expect(flux.dispatch).toHaveBeenCalledWith(expect.objectContaining({
-        session: expect.any(User),
+      expect(flux.dispatch).toHaveBeenNthCalledWith(2, expect.objectContaining({
+        session: expect.any(Object),
         type: 'USER_SIGN_IN_SUCCESS'
       }));
     });

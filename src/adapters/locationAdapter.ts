@@ -57,7 +57,7 @@ export const validateLocationInput = (location: unknown): LocationType => {
     return validated as LocationType;
   } catch(error) {
     if(error instanceof z.ZodError) {
-      const fieldErrors = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const fieldErrors = error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
       throw new LocationValidationError(`Location validation failed: ${fieldErrors}`);
     }
     throw error;
@@ -97,11 +97,11 @@ const performLocationTransformation = (location: LocationType): LocationType => 
 
   const transformed = removeEmptyKeys({
     ...parseDocument(location),
-    ...(address && {address: parseString(address, 128)}),
-    ...(city && {city: parseChar(city, 32)}),
-    ...(country && {country: parseChar(country, 2)}),
     ...((_id || id || _key || locationId) && {id: parseArangoId(_id || id || `locations/${_key || locationId}`)}),
     ...((_key || locationId) && {locationId: parseId(_key || locationId)}),
+    ...(address && {address: parseString(address, 128)}),
+    ...(city && {city: parseString(city, 32)}),
+    ...(country && {country: parseChar(country, 2)}),
     ...(latitude !== undefined && {latitude: parseNum(latitude, 15)}),
     ...(locationStr && {location: parseString(locationStr, 128)}),
     ...(longitude !== undefined && {longitude: parseNum(longitude, 15)}),

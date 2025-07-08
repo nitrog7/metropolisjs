@@ -4,31 +4,31 @@
  */
 import type {LocationType} from '../adapters/locationAdapter';
 
-export class LocationConstants {
-  static readonly ADD_ITEM_ERROR: string = 'LOCATION_ADD_ITEM_ERROR';
-  static readonly ADD_ITEM_SUCCESS: string = 'LOCATION_ADD_ITEM_SUCCESS';
-  static readonly GET_ITEM_ERROR: string = 'LOCATION_GET_ITEM_ERROR';
-  static readonly GET_ITEM_SUCCESS: string = 'LOCATION_GET_ITEM_SUCCESS';
-  static readonly GET_LIST_ERROR: string = 'LOCATION_GET_LIST_ERROR';
-  static readonly GET_LIST_SUCCESS: string = 'LOCATION_GET_LIST_SUCCESS';
-  static readonly REMOVE_ITEM_ERROR: string = 'LOCATION_REMOVE_ITEM_ERROR';
-  static readonly REMOVE_ITEM_SUCCESS: string = 'LOCATION_REMOVE_ITEM_SUCCESS';
-  static readonly SET_CURRENT: string = 'LOCATION_SET_CURRENT';
-  static readonly UPDATE_ITEM_ERROR: string = 'LOCATION_UPDATE_ITEM_ERROR';
-  static readonly UPDATE_ITEM_SUCCESS: string = 'LOCATION_UPDATE_ITEM_SUCCESS';
-}
+export const LOCATION_CONSTANTS = {
+  ADD_ITEM_ERROR: 'LOCATION_ADD_ITEM_ERROR',
+  ADD_ITEM_SUCCESS: 'LOCATION_ADD_ITEM_SUCCESS',
+  GET_ITEM_ERROR: 'LOCATION_GET_ITEM_ERROR',
+  GET_ITEM_SUCCESS: 'LOCATION_GET_ITEM_SUCCESS',
+  GET_LIST_ERROR: 'LOCATION_GET_LIST_ERROR',
+  GET_LIST_SUCCESS: 'LOCATION_GET_LIST_SUCCESS',
+  REMOVE_ITEM_ERROR: 'LOCATION_REMOVE_ITEM_ERROR',
+  REMOVE_ITEM_SUCCESS: 'LOCATION_REMOVE_ITEM_SUCCESS',
+  SET_CURRENT: 'LOCATION_SET_CURRENT',
+  UPDATE_ITEM_ERROR: 'LOCATION_UPDATE_ITEM_ERROR',
+  UPDATE_ITEM_SUCCESS: 'LOCATION_UPDATE_ITEM_SUCCESS'
+} as const;
 
 interface LocationState {
   current: LocationType | null;
 }
 
 export const defaultValues: LocationState = {
-  current: null
+  current: undefined
 };
 
-export const locations = (type: string, data: {current?: LocationType}, state = defaultValues): LocationState => {
+export const locationStore = (type: string, data: {current?: LocationType}, state = defaultValues): LocationState => {
   switch(type) {
-    case LocationConstants.SET_CURRENT: {
+    case LOCATION_CONSTANTS.SET_CURRENT: {
       const {current} = data;
       return {...state, current};
     }
@@ -36,4 +36,10 @@ export const locations = (type: string, data: {current?: LocationType}, state = 
       return state;
     }
   }
+};
+
+export const locations = {
+  action: locationStore,
+  name: 'location',
+  initialState: defaultValues
 };

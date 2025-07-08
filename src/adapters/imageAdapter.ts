@@ -1,4 +1,4 @@
-import {parseArangoId, parseNum, parseString, parseUrl} from '@nlabs/utils';
+import {parseArangoId, parseId, parseNum, parseString, parseUrl} from '@nlabs/utils';
 import {z} from 'zod';
 
 import {parseDocument, removeEmptyKeys} from './arangoAdapter';
@@ -64,7 +64,7 @@ export const validateImageInput = (image: unknown): ImageType => {
     return validated as ImageType;
   } catch(error) {
     if(error instanceof z.ZodError) {
-      const fieldErrors = error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const fieldErrors = error.issues.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
       throw new ImageValidationError(`Image validation failed: ${fieldErrors}`);
     }
     throw error;
@@ -108,10 +108,10 @@ const performImageTransformation = (image: ImageType): ImageType => {
 
   const transformed = removeEmptyKeys({
     ...parseDocument(image),
-    ...(_key && {imageId: parseArangoId(_key)}),
+    ...((_key || imageId) && {imageId: parseId(_key || imageId)}),
+    ...((_id || id || _key || imageId) && {id: parseArangoId(_id || id || `images/${_key || imageId}`)}),
     ...(bucket && {bucket}),
     ...(color && {color}),
-    ...((_id || id || _key || imageId) && {imageId: parseArangoId(_id || id || `images/${_key || imageId}`)}),
     ...(height !== undefined && {height: parseNum(height)}),
     ...(model && {model: parseString(model, 160)}),
     ...(make && {make: parseString(make, 160)}),
