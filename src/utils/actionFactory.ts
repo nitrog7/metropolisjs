@@ -11,6 +11,7 @@ import {createLocationActions} from '../actions/locationActions/locationActions'
 import {createMessageActions} from '../actions/messageActions/messageActions';
 import {createPostActions} from '../actions/postActions/postActions';
 import {createReactionActions} from '../actions/reactionActions/reactionActions';
+import {createSSEActions} from '../actions/sseActions/sseActions';
 import {createTagActions} from '../actions/tagActions/tagActions';
 import {createUserActions} from '../actions/userActions/userActions';
 import {createWebsocketActions} from '../actions/websocketActions/websocketActions';
@@ -22,29 +23,32 @@ import type {LocationActionsOptions} from '../actions/locationActions/locationAc
 import type {MessageActionsOptions} from '../actions/messageActions/messageActions';
 import type {PostActionsOptions} from '../actions/postActions/postActions';
 import type {ReactionActionsOptions} from '../actions/reactionActions/reactionActions';
+import type {SSEActionsOptions} from '../actions/sseActions/sseActions';
 import type {TagActionsOptions} from '../actions/tagActions/tagActions';
 import type {UserActionsOptions} from '../actions/userActions/userActions';
 
 export type ActionType =
-  | 'user'
-  | 'post'
   | 'event'
-  | 'message'
   | 'image'
   | 'location'
+  | 'message'
+  | 'post'
   | 'reaction'
+  | 'sse'
   | 'tag'
+  | 'user'
   | 'websocket';
 
 export type ActionOptions =
-  | UserActionsOptions
-  | PostActionsOptions
   | EventActionsOptions
-  | MessageActionsOptions
   | ImageActionsOptions
   | LocationActionsOptions
+  | MessageActionsOptions
+  | PostActionsOptions
   | ReactionActionsOptions
+  | SSEActionsOptions
   | TagActionsOptions
+  | UserActionsOptions
   | undefined;
 
 /**
@@ -85,17 +89,8 @@ export const createAction = <T extends ActionType>(
   options?: ActionOptions
 ) => {
   switch(actionType) {
-    case 'user':
-      return createUserActions(flux, options as UserActionsOptions);
-
-    case 'post':
-      return createPostActions(flux, options as PostActionsOptions);
-
     case 'event':
       return createEventActions(flux, options as EventActionsOptions);
-
-    case 'message':
-      return createMessageActions(flux, options as MessageActionsOptions);
 
     case 'image':
       return createImageActions(flux, options as ImageActionsOptions);
@@ -103,11 +98,23 @@ export const createAction = <T extends ActionType>(
     case 'location':
       return createLocationActions(flux, options as LocationActionsOptions);
 
+    case 'message':
+      return createMessageActions(flux, options as MessageActionsOptions);
+
+    case 'post':
+      return createPostActions(flux, options as PostActionsOptions);
+
     case 'reaction':
       return createReactionActions(flux, options as ReactionActionsOptions);
 
+    case 'sse':
+      return createSSEActions(flux, options as SSEActionsOptions);
+
     case 'tag':
       return createTagActions(flux, options as TagActionsOptions);
+
+    case 'user':
+      return createUserActions(flux, options as UserActionsOptions);
 
     case 'websocket':
       return createWebsocketActions(flux);
@@ -177,14 +184,15 @@ export const createAllActions = (
   options?: Partial<Record<ActionType, ActionOptions>>
 ) => {
   const allActionTypes: ActionType[] = [
-    'user',
-    'post',
     'event',
-    'message',
     'image',
     'location',
+    'message',
+    'post',
     'reaction',
+    'sse',
     'tag',
+    'user',
     'websocket'
   ];
 
