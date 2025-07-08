@@ -4,7 +4,7 @@
  */
 import {DateTime} from 'luxon';
 
-import type {TagType} from '../adapters/tagAdapter';
+import type {TagType} from '../adapters/tagAdapter/tagAdapter';
 
 export const TAG_CONSTANTS = {
   ADD_ITEM_ERROR: 'TAG_ADD_ITEM_ERROR',

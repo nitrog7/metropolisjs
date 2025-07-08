@@ -11,7 +11,7 @@ import {REACTION_CONSTANTS} from './reactionStore';
 import {TAG_CONSTANTS} from './tagStore';
 
 import type {ReactionType, User} from '../adapters';
-import type {PersonaType} from '../adapters/personaAdapter';
+import type {PersonaType} from '../adapters/personaAdapter/personaAdapter';
 
 export const USER_CONSTANTS = {
   ADD_ITEM_ERROR: 'USER_ADD_ITEM_ERROR',

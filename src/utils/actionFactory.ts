@@ -5,25 +5,25 @@
 
 
 // Import all action creators
-import {createEventActions} from '../actions/eventActions';
-import {createImageActions} from '../actions/imageActions';
-import {createLocationActions} from '../actions/locationActions';
-import {createMessageActions} from '../actions/messageActions';
-import {createPostActions} from '../actions/postActions';
-import {createReactionActions} from '../actions/reactionActions';
-import {createTagActions} from '../actions/tagActions';
-import {createUserActions} from '../actions/userActions';
-import {createWebsocketActions} from '../actions/websocketActions';
+import {createEventActions} from '../actions/eventActions/eventActions';
+import {createImageActions} from '../actions/imageActions/imageActions';
+import {createLocationActions} from '../actions/locationActions/locationActions';
+import {createMessageActions} from '../actions/messageActions/messageActions';
+import {createPostActions} from '../actions/postActions/postActions';
+import {createReactionActions} from '../actions/reactionActions/reactionActions';
+import {createTagActions} from '../actions/tagActions/tagActions';
+import {createUserActions} from '../actions/userActions/userActions';
+import {createWebsocketActions} from '../actions/websocketActions/websocketActions';
 
 import type {FluxFramework} from '@nlabs/arkhamjs';
-import type {EventActionsOptions} from '../actions/eventActions';
-import type {ImageActionsOptions} from '../actions/imageActions';
-import type {LocationActionsOptions} from '../actions/locationActions';
-import type {MessageActionsOptions} from '../actions/messageActions';
-import type {PostActionsOptions} from '../actions/postActions';
-import type {ReactionActionsOptions} from '../actions/reactionActions';
-import type {TagActionsOptions} from '../actions/tagActions';
-import type {UserActionsOptions} from '../actions/userActions';
+import type {EventActionsOptions} from '../actions/eventActions/eventActions';
+import type {ImageActionsOptions} from '../actions/imageActions/imageActions';
+import type {LocationActionsOptions} from '../actions/locationActions/locationActions';
+import type {MessageActionsOptions} from '../actions/messageActions/messageActions';
+import type {PostActionsOptions} from '../actions/postActions/postActions';
+import type {ReactionActionsOptions} from '../actions/reactionActions/reactionActions';
+import type {TagActionsOptions} from '../actions/tagActions/tagActions';
+import type {UserActionsOptions} from '../actions/userActions/userActions';
 
 export type ActionType =
   | 'user'

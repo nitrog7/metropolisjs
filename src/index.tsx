@@ -5,7 +5,7 @@
 import {useFlux} from '@nlabs/arkhamjs-utils-react';
 import React, {useEffect, useState} from 'react';
 
-import {createWebsocketActions} from './actions/websocketActions';
+import {createWebsocketActions} from './actions/websocketActions/websocketActions';
 import {Config, MetropolisConfiguration} from './config';
 import {
   app,

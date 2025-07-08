@@ -4,16 +4,16 @@
  */
 
 import {
-    createAction,
-    createActions,
-    createAllActions,
-    type ActionType
+  createAction,
+  createActions,
+  createAllActions,
+  type ActionType
 } from '../utils/actionFactory';
 
-import type { FluxFramework } from '@nlabs/arkhamjs';
-import type { PostActions } from '../actions/postActions';
-import type { userActions } from '../actions/userActions';
-import type { WebsocketActions } from '../actions/websocketActions';
+import type {FluxFramework} from '@nlabs/arkhamjs';
+import type {PostActions} from '../actions/postActions/postActions';
+import type {userActions} from '../actions/userActions/userActions';
+import type {WebsocketActions} from '../actions/websocketActions/websocketActions';
 
 
 /**
