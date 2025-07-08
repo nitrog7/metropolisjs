@@ -22,7 +22,6 @@ import {refreshSession} from './utils/api';
 import {MetropolisAdapters, MetropolisContext} from './utils/MetropolisProvider';
 
 import type {FluxFramework} from '@nlabs/arkhamjs';
-import type {ReactElement} from 'react';
 
 export {MetropolisConfiguration} from './config';
 
@@ -70,7 +69,7 @@ export interface MetropolisProps {
   readonly config?: MetropolisConfiguration;
 }
 
-export const Metropolis = ({adapters, children, config = {}}: MetropolisProps): ReactElement => {
+export const Metropolis = ({adapters, children, config = {}}: MetropolisProps) => {
   Config.setConfig(config);
   console.log('Metropolis::init', {config});
   const flux = useFlux();
@@ -171,7 +170,7 @@ export const Metropolis = ({adapters, children, config = {}}: MetropolisProps): 
         updateNotification: () => { }
       }}>
       {children}
-    </MetropolisContext.Provider >
+    </MetropolisContext.Provider>
   );
 };
 
