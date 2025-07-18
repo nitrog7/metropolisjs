@@ -71,7 +71,7 @@ const performPersonaTransformation = (persona: PersonaType): PersonaType => {
   const transformed = removeEmptyKeys({
     ...parseDocument(persona),
     ...((_id || id || _key || personaId) && {id: parseArangoId(_id || id || `personas/${_key || personaId}`)}),
-    ...((_key || personaId) && {personaId: parseId(_key || personaId)})
+    ...((_key || personaId) && {personaId: parseId(_key || personaId || '')})
   });
 
   return transformed;

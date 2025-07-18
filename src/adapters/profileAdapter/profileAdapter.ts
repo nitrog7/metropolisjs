@@ -125,12 +125,12 @@ const performProfileTransformation = (profile: ProfileType): ProfileType => {
     ...(imageUrl && {imageUrl}),
     ...(likeCount !== undefined && {likeCount: parseNum(likeCount)}),
     ...(name && {name: parseString(name, 64)}),
-    ...((_key || profileId) && {profileId: parseId(_key || profileId)}),
+    ...((_key || profileId) && {profileId: parseId(_key || profileId || '')}),
     ...(tags?.length && {tags: tags.map((tag) => parseTag(tag))}),
     ...(thumbUrl && {thumbUrl}),
     ...(userId && {userId: parseId(userId)}),
     ...(viewCount !== undefined && {viewCount: parseNum(viewCount)})
   });
 
-  return transformed;
+  return transformed as ProfileType;
 };

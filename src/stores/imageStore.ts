@@ -39,7 +39,7 @@ export const imageStore = (type: string, data: {
       }
 
       const {lists} = state;
-      return {...state, lists: {...lists, [itemId]: list}};
+      return {...state, lists: {...lists, [itemId]: list || []}};
     }
     default: {
       return state;

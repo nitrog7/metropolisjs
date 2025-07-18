@@ -79,7 +79,7 @@ const performReactionTransformation = (reaction: ReactionType): ReactionType => 
     ...parseDocument(reaction),
     ...((_id || id || _key || reactionId) && {id: parseArangoId(_id || id || `reactions/${_key || reactionId}`)}),
     ...(name && {name: parseVarChar(name, 32)}),
-    ...((_key || reactionId) && {reactionId: parseId(_key || reactionId)}),
+    ...((_key || reactionId) && {reactionId: parseId(_key || reactionId || '')}),
     ...(value && {value: parseVarChar(value, 32)})
   });
 

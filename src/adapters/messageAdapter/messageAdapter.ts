@@ -94,7 +94,7 @@ const performMessageTransformation = (message: MessageType): MessageType => {
   const transformed = removeEmptyKeys({
     ...parseDocument(message),
     ...((_id || id || _key || messageId) && {id: parseArangoId(_id || id || `messages/${_key || messageId}`)}),
-    ...((_key || messageId) && {messageId: parseId(_key || messageId)}),
+    ...((_key || messageId) && {messageId: parseId(_key || messageId || '')}),
     ...(content && {content}),
     ...(Array.isArray(files) && {files: files.map(parseFile)}),
     ...(Array.isArray(images) && {images: images.map(parseImage)}),

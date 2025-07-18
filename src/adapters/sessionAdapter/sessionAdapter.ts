@@ -89,7 +89,7 @@ const performSessionTransformation = (session: SessionType): SessionType => {
     ...(expires !== undefined && {expires: parseReaktorDate(expires)}),
     ...((_id || id || _key || sessionId) && {id: parseArangoId(_id || id || `sessions/${_key || sessionId}`)}),
     ...(issued !== undefined && {issued: parseReaktorDate(issued)}),
-    ...((_key || sessionId) && {sessionId: parseId(_key || sessionId)}),
+    ...((_key || sessionId) && {sessionId: parseId(_key || sessionId || '')}),
     ...(token && {token}),
     ...(userId && {userId: parseId(userId)}),
     ...(username && {username: parseUsername(username)})

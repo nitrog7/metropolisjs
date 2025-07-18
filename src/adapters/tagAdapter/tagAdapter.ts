@@ -80,8 +80,8 @@ const performTagTransformation = (tag: TagType): TagType => {
     ...parseDocument(tag),
     ...(category && {category: parseReaktorType(category)}),
     ...(description && {description: parseReaktorContent(description)}),
-    ...((_id || id) && {id: parseArangoId(_id || id)}),
-    ...((_key || tagId) && {tagId: parseId(_key || tagId)}),
+    ...((_id || id) && {id: parseArangoId(_id || id || '')}),
+    ...((_key || tagId) && {tagId: parseId(_key || tagId || '')}),
     ...(name && {name: parseString(name, 160)}),
     ...(tagBy && {tagBy: parseId(tagBy)}),
     ...(userId && {userId: parseId(userId)})

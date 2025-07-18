@@ -129,7 +129,7 @@ const performPostTransformation = (post: PostType): PostType => {
     ...(name && {name: parseString(name, 160)}),
     ...(parentId && {parentId: parseId(parentId)}),
     ...((_id || id || _key || postId) && {id: parseArangoId(_id || id || `posts/${_key || postId}`)}),
-    ...((_key || postId) && {postId: parseId(_key || postId)}),
+    ...((_key || postId) && {postId: parseId(_key || postId || '')}),
     ...(privacy && {privacy: parseVarChar(privacy, 16)}),
     ...(tags?.length && {tags: tags.map((tag) => parseTag(tag))}),
     ...(type && {type: parseReaktorType(type)}),

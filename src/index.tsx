@@ -3,7 +3,7 @@
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
 import {useFlux} from '@nlabs/arkhamjs-utils-react';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 
 import {createWebsocketActions} from './actions/websocketActions/websocketActions';
 import {Config, type MetropolisConfiguration} from './config';
@@ -75,9 +75,13 @@ export const Metropolis = ({adapters, children, config = {}}: MetropolisProps) =
   console.log('Metropolis::init', {config});
   const flux = useFlux();
   const websockets = createWebsocketActions(flux);
-  const [messages, setMessages] = useState([]);
-  const [notifications, setNotifications] = useState([]);
-  const [session, setSession] = useState({});
+  // const [messages, setMessages] = useState<MessageType[]>([]);
+  // const [notifications, setNotifications] = useState<any[]>([]);
+  // const [session, setSession] = useState<SessionType>({});
+
+  const messages = [];
+  const notifications = [];
+  const session = {};
 
   // Save config to app
   // const {isAuth: configAuth} = config;

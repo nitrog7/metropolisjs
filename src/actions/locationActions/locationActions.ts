@@ -70,7 +70,7 @@ const createLocationValidator = (
 
   // Apply custom validation from options if provided
   if(mergedOptions?.customValidation) {
-    validated = mergedOptions.customValidation(validated);
+    validated = mergedOptions.customValidation(validated) as LocationType;
   }
 
   return validated;
@@ -204,7 +204,7 @@ export const createLocationActions = (
 
   const getCurrentLocation = async (setLocation?: (location: LocationType) => void): Promise<LocationType> => new Promise((resolve, reject) => {
     const {userId}: User = flux.getState('user.session', {});
-    const {city, country, latitude, longitude, state}: User = flux.getState(['user', 'users', userId], {});
+    const {city, country, latitude, longitude, state}: User = flux.getState(['user', 'users', userId || ''], {});
     const locationStr: string = [city, state, country].join(', ');
     const profileLocation = {
       latitude,

@@ -23,14 +23,14 @@ interface LocationState {
 }
 
 export const defaultValues: LocationState = {
-  current: undefined
+  current: null
 };
 
 export const locationStore = (type: string, data: {current?: LocationType}, state = defaultValues): LocationState => {
   switch(type) {
     case LOCATION_CONSTANTS.SET_CURRENT: {
       const {current} = data;
-      return {...state, current};
+      return {...state, current: current || null};
     }
     default: {
       return state;

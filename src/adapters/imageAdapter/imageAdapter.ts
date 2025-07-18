@@ -108,7 +108,7 @@ const performImageTransformation = (image: ImageType): ImageType => {
 
   const transformed = removeEmptyKeys({
     ...parseDocument(image),
-    ...((_key || imageId) && {imageId: parseId(_key || imageId)}),
+    ...((_key || imageId) && {imageId: parseId(_key || imageId || '')}),
     ...((_id || id || _key || imageId) && {id: parseArangoId(_id || id || `images/${_key || imageId}`)}),
     ...(bucket && {bucket}),
     ...(color && {color}),

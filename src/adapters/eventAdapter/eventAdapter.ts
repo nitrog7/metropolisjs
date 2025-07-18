@@ -145,7 +145,7 @@ const performEventTransformation = (event: EventType): EventType => {
     ...(content && {content: parseReaktorContent(content)}),
     ...(endDate !== undefined && {endDate: parseReaktorDate(endDate)}),
     ...((_id || id || _key || eventId) && {id: parseArangoId(_id || id || `events/${_key || eventId}`)}),
-    ...((_key || eventId) && {eventId: parseId(_key || eventId)}),
+    ...((_key || eventId) && {eventId: parseId(_key || eventId || '')}),
     ...(groupId && {groupId: parseId(groupId)}),
     ...(images?.length && {images: images.map((image) => parseImage(image))}),
     ...(isGoing !== undefined && {isGoing: !!isGoing}),

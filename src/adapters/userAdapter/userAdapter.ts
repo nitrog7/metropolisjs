@@ -221,7 +221,7 @@ const performUserTransformation = (user: User): User => {
   const transformed = {
     ...parseDocument(user),
     ...((_id || id || _key || userId) && {id: parseArangoId(_id || id || `users/${_key || userId}`)}),
-    ...((_key || userId) && {userId: parseId(_key || userId)}),
+    ...((_key || userId) && {userId: parseId(_key || userId || '')}),
     ...(active !== undefined && {active: !!active}),
     ...(bankId && {bankId: parseVarChar(bankId, 160)}),
     ...(city && {city: parseVarChar(city, 160)}),

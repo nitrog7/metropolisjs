@@ -7,7 +7,7 @@ import {capitalize, orderBy, pullAllBy, uniqBy} from '@nlabs/utils';
 import {REACTION_CONSTANTS} from './reactionStore';
 import {TAG_CONSTANTS} from './tagStore';
 
-import type {ReactionType, User} from '../adapters';
+import type {ReactionType, TagType, User} from '../adapters';
 import type {PersonaType} from '../adapters/personaAdapter/personaAdapter';
 
 export const USER_CONSTANTS = {
@@ -96,7 +96,7 @@ export const userStore = (type: string, data: UserData, state = defaultValues): 
       }
 
       const {users} = state;
-      const {name: reactionName, value: reactionValue} = reaction;
+      const {name: reactionName = '', value: reactionValue} = reaction;
       const value: boolean = reactionValue === 'true';
 
       if(itemId && users[itemId]) {
@@ -123,8 +123,8 @@ export const userStore = (type: string, data: UserData, state = defaultValues): 
       const {tag} = data;
       const {session = {}} = state;
       const {tags = []} = session;
-      const updatedTags = uniqBy([...tags, tag], 'tagId');
-      session.tags = orderBy(updatedTags, 'name', 'asc');
+      const updatedTags = uniqBy([...tags, tag], (item: TagType) => item.tagId);
+      session.tags = orderBy(updatedTags, ['name'], ['asc']);
       return {...state, session};
     }
     case TAG_CONSTANTS.REMOVE_PROFILE_SUCCESS: {

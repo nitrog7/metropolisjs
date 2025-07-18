@@ -71,8 +71,8 @@ const performDocumentTransformation = (doc: DocumentType): DocumentType => {
 
   const transformed = removeEmptyKeys({
     ...doc,
-    ...((_id || id) && {id: parseArangoId(_id || id)}),
-    ...(_key && {_key: parseId(_key)}),
+    ...((_id || id) && {id: parseArangoId(_id || id || '')}),
+    ...(_key && {_key: parseId(_key || '')}),
     ...(added !== undefined && {added: parseNum(added, 13)}),
     ...(modified !== undefined && {modified: parseNum(modified, 13)})
   });

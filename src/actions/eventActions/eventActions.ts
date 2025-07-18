@@ -58,7 +58,7 @@ const createEventValidator = (
 
   // Apply custom validation from options if provided
   if(mergedOptions?.customValidation) {
-    validated = mergedOptions.customValidation(validated);
+    validated = mergedOptions.customValidation(validated) as EventType;
   }
 
   return validated;

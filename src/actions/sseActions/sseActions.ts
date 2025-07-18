@@ -106,14 +106,14 @@ export const createSSEActions = (
     });
   };
 
-  const handleClose = (event: CloseEvent) => {
-    options?.onClose?.(event);
+  // const handleClose = (event: CloseEvent) => {
+  //   options?.onClose?.(event);
 
-    flux.dispatch({
-      type: 'SSE_CONNECTION_CLOSED',
-      event
-    });
-  };
+  //   flux.dispatch({
+  //     type: 'SSE_CONNECTION_CLOSED',
+  //     event
+  //   });
+  // };
 
   const connect = async (connectionOptions?: SSEConnectionOptions): Promise<void> => {
     const opts = { ...defaultOptions, ...connectionOptions };

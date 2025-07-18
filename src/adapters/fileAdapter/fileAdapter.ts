@@ -76,7 +76,7 @@ export const getFileType = (file: FileType): string => {
   }
 
   const nameArr: string[] = name?.split('.') || [];
-  const ext: string = nameArr.length && nameArr[nameArr.length - 1];
+  const ext = nameArr.length > 0 ? nameArr[nameArr.length - 1] : '';
 
   switch(ext) {
     case 'jpeg':
@@ -87,7 +87,7 @@ export const getFileType = (file: FileType): string => {
     case 'zip':
       return 'application/zip';
     default:
-      return undefined;
+      return '';
   }
 };
 
@@ -126,7 +126,7 @@ const performFileTransformation = (file: FileType): FileType => {
     ...(base64 && {base64}),
     ...(buffer && {buffer}),
     ...(description && {description: parseReaktorContent(description)}),
-    ...((_key || fileId) && {fileId: parseId(_key || fileId)}),
+    ...((_key || fileId) && {fileId: parseId(_key || fileId || '')}),
     ...((_id || id || _key || fileId) && {id: parseArangoId(_id || id || `files/${_key || fileId}`)}),
     ...(fileSize !== undefined && {fileSize: parseNum(fileSize)}),
     ...(fileType && {fileType: getFileType(file)}),

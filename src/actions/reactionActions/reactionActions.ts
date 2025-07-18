@@ -65,7 +65,7 @@ const createReactionValidator = (
 
   // Apply custom validation from options if provided
   if(mergedOptions?.customValidation) {
-    validated = mergedOptions.customValidation(validated);
+    validated = mergedOptions.customValidation(validated) as ReactionType;
   }
 
   return validated;
@@ -266,7 +266,7 @@ export const createReactionActions = (
         'hasReaction',
         DATA_TYPE,
         queryVariables,
-        null,
+        [],
         {onSuccess}
       );
       return hasReactionResult as boolean;

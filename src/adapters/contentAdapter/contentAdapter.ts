@@ -110,7 +110,7 @@ const performContentTransformation = (content: ContentType): ContentType => {
 
   const transformed = {
     ...parseDocument(content),
-    ...((_key || contentId) && {contentId: parseId(_key || contentId)}),
+    ...((_key || contentId) && {contentId: parseId(_key || contentId || '')}),
     ...((_id || id || _key || contentId) && {id: parseArangoId(_id || id || `content/${_key || contentId}`)}),
     key: parseString(key, 200),
     locale,

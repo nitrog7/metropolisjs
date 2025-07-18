@@ -86,7 +86,7 @@ const performConversationTransformation = (conversation: ConversationType): Conv
   const transformed = removeEmptyKeys({
     ...parseDocument(conversation),
     ...((_id || id || _key || conversationId) && {id: parseArangoId(_id || id || `conversations/${_key || conversationId}`)}),
-    ...((_key || conversationId) && {conversationId: parseId(_key || conversationId)}),
+    ...((_key || conversationId) && {conversationId: parseId(_key || conversationId || '')}),
     ...(isDirect !== undefined && {isDirect: !!isDirect}),
     ...(name && {name: parseString(name, 160)}),
     ...(users?.length && {users: users.map((user) => parseUser(user))})

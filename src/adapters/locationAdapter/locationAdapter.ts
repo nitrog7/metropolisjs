@@ -98,7 +98,7 @@ const performLocationTransformation = (location: LocationType): LocationType => 
   const transformed = removeEmptyKeys({
     ...parseDocument(location),
     ...((_id || id || _key || locationId) && {id: parseArangoId(_id || id || `locations/${_key || locationId}`)}),
-    ...((_key || locationId) && {locationId: parseId(_key || locationId)}),
+    ...((_key || locationId) && {locationId: parseId(_key || locationId || '')}),
     ...(address && {address: parseString(address, 128)}),
     ...(city && {city: parseString(city, 32)}),
     ...(country && {country: parseChar(country, 2)}),

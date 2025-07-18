@@ -336,7 +336,7 @@ export const createUserActions = (
       return flux.dispatch({persona: updatePersona, type: USER_CONSTANTS.UPDATE_PERSONA_SUCCESS});
     };
 
-    const {persona} = await appMutation(flux, 'updatePersona', DATA_TYPE, queryVariables, null, {onSuccess});
+    const {persona} = await appMutation(flux, 'updatePersona', DATA_TYPE, queryVariables, [], {onSuccess});
     return persona as PersonaType;
   };
 

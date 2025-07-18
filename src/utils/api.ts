@@ -25,6 +25,7 @@ export type ReaktorDbCollection =
   'notifications' |
   'payments' |
   'posts' |
+  'profiles' |
   'reactions' |
   'subscriptions' |
   'tags' |

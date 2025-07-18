@@ -2,12 +2,12 @@
  * Copyright (c) 2021-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import {createContext} from 'react';
+import { createContext } from 'react';
 
-import {parseEvent, parseImage, parseLocation, parseMessage, parsePost, parseReaction, parseTag, parseUser} from '../adapters';
+import { parseEvent, parseImage, parseLocation, parseMessage, parsePost, parseProfile, parseReaction, parseTag, parseUser } from '../adapters';
 
-import type {MessageType} from '../adapters';
-import type {SessionType} from './api';
+import type { MessageType } from '../adapters';
+import type { SessionType } from './api';
 
 export interface MetropolisAdapters {
   readonly Event?: typeof parseEvent;
@@ -15,6 +15,7 @@ export interface MetropolisAdapters {
   readonly Location?: typeof parseLocation;
   readonly Message?: typeof parseMessage;
   readonly Post?: typeof parsePost;
+  readonly Profile?: typeof parseProfile;
   readonly Reaction?: typeof parseReaction;
   readonly Tag?: typeof parseTag;
   readonly User?: typeof parseUser;
