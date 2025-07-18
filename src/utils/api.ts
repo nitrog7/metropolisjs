@@ -1,7 +1,5 @@
-import {ApiError, graphqlQuery, HunterOptionsType, HunterQueryType, post} from '@nlabs/rip-hunter';
-import camelCase from 'lodash/camelCase';
-import isEmpty from 'lodash/isEmpty';
-import upperFirst from 'lodash/upperFirst';
+import {ApiError, graphqlQuery, post} from '@nlabs/rip-hunter';
+import {camelCase, isEmpty, upperFirst} from '@nlabs/utils';
 import {DateTime} from 'luxon';
 
 import {Config} from '../config';
@@ -9,9 +7,10 @@ import {APP_CONSTANTS} from '../stores/appStore';
 import {USER_CONSTANTS} from '../stores/userStore';
 
 import type {FluxAction, FluxFramework} from '@nlabs/arkhamjs';
+import type {HunterOptionsType, HunterQueryType} from '@nlabs/rip-hunter';
 
 export interface ApiOptions {
-  readonly onSuccess?: (data: unknown) => Promise<FluxAction>;
+  readonly onSuccess?: (data: any) => Promise<FluxAction>;
   readonly variables?: Record<string, unknown>;
 }
 
@@ -65,38 +64,38 @@ export const getGraphql = async (
   options: ApiOptions
 ): Promise<ApiResultsType> => {
   const {onSuccess} = options;
-  const retry: RetryType = {query, responseMethod: onSuccess};
-  const networkType: string = flux.getState('app.networkType');
+  const retry: RetryType = {query, responseMethod: onSuccess || (() => {})};
+  const networkType: string = flux.getState('app.networkType') as string;
 
   if(networkType === 'none') {
     return flux.dispatch({retry, type: APP_CONSTANTS.API_NETWORK_ERROR});
   }
 
   const now: number = Date.now();
-  const {expires = now, issued = now, token: currentToken} = (flux.getState('user.session') || {}) as SessionType;
-  let token: string;
+  const {expires = now, issued: _issued = now, token: currentToken}: SessionType = (flux.getState('user.session') || {}) as SessionType;
+  let token: string | undefined;
 
-  console.log('getGraphql::authenticate', {authenticate, currentToken});
+  // console.log('getGraphql::authenticate', {authenticate, currentToken});
   if(authenticate) {
     const nowDate: DateTime = DateTime.local();
     const expiresDate: DateTime = DateTime.fromMillis(expires);
     const expiredDiff: number = Math.round(expiresDate.diff(nowDate, 'minutes').toObject().minutes);
     token = currentToken;
 
-    console.log('getGraphql::expiredDiff', expiredDiff);
+    // console.log('getGraphql::expiredDiff', expiredDiff);
     if(expiredDiff > 0) {
       const sessionMin: number = Config.get('app.session.minMinutes', 0);
       const issuedDate: DateTime = DateTime.fromMillis(expires);
       const issuedDiff: number = Math.round(nowDate.diff(issuedDate, 'minutes').toObject().minutes);
 
-      console.log({issued, issuedDiff, sessionMin});
+      // console.log({issued, issuedDiff, sessionMin});
       if(issuedDiff >= sessionMin) {
         const {
-          session: updatedSession = {token: undefined}
-        } = (await refreshSession(flux, currentToken, sessionMin)) || {} as FluxAction;
-        const {token: newToken} = (updatedSession || {}) as SessionType;
+          session: updatedSession = {}
+        }: ApiResultsType = (await refreshSession(flux, currentToken, sessionMin)) || {};
+        const {token: newToken}: SessionType = (updatedSession || {});
 
-        console.log({newToken});
+        // console.log({newToken});
         if(!newToken) {
           Promise.reject(new ApiError(['invalid_session'], 'invalid_session'));
         }
@@ -106,18 +105,18 @@ export const getGraphql = async (
     }
   }
 
-  console.log('getGraphql::query', {query, token, url});
-  return graphqlQuery(url, query, {token})
+  // console.log('getGraphql::query', {query, token, url});
+  return graphqlQuery(url, query, {token: token || ''})
     .then(async (results) => {
       await flux.dispatch({type: APP_CONSTANTS.API_NETWORK_SUCCESS});
-      console.log('GraphqlApi::results', results);
+      // console.log('GraphqlApi::results', results);
       return results;
     })
     .then((data) => (onSuccess ? onSuccess(data) : data))
     .catch(async (error) => {
       const {errors = []} = error;
 
-      console.log({error});
+      // console.log({error});
       if(onSuccess && errors.includes('network_error')) {
         await flux.dispatch({retry, type: APP_CONSTANTS.API_NETWORK_ERROR});
         return Promise.reject(error);
@@ -137,28 +136,38 @@ export const createQuery = (
   returnProperties: string[] = [],
   type = 'query'
 ) => {
-  const queryVariables = variables || {};
+  const queryVariables = {...variables || {}};
   const variableKeys = Object.keys(queryVariables);
   const queryName = name.replace(/ /g, '');
-  const query = `${type} ${upperFirst(camelCase(`${dataType}_${queryName}`))}${variableKeys.length
-    ? `(${variableKeys.map((key) => `$${key}: ${queryVariables[key].type}`).join(', ')})`
-    : ''} {
-      ${dataType} {
-        ${camelCase(queryName)}${variableKeys.length ? `(${variableKeys.map((key) => `${key}: $${key}`).join(', ')})` : ''}
-        ${returnProperties?.length ? `{${returnProperties.join(', ')}}` : ''}
+  const query = `${type} ${upperFirst(camelCase(`${dataType}_${queryName}`))}${
+    variableKeys.length
+      ? `(${variableKeys.map((key) => `$${key}: ${queryVariables[key].type}`).join(', ')})`
+      : ''
+  } {
+    ${dataType} {
+      ${camelCase(queryName)}${
+        variableKeys.length
+          ? `(${variableKeys.map((key) => `${key}: $${key}`).join(', ')})`
+          : ''
       }
-    }`;
+      ${returnProperties?.length ? `{${returnProperties.join(', ')}}` : ''}
+    }
+  }`;
 
-  return {query, variables: variableKeys.reduce((queryData, key) => {
+  const updatedVariables: Record<string, unknown> = variableKeys.reduce((queryData, key) => {
     queryData[key] = queryVariables[key].value;
-
     return queryData;
-  }, {} as Record<string, unknown>
-  )};
+  }, {});
+
+  return {query, variables: updatedVariables};
 };
 
-export const createMutation = (name: string, dataType: ReaktorDbCollection, variables: ApiQueryVariables = {}, returnProperties: string[] = []) =>
-  createQuery(name, dataType, variables, returnProperties, 'mutation');
+export const createMutation = (
+  name: string,
+  dataType: ReaktorDbCollection,
+  variables: ApiQueryVariables = {},
+  returnProperties: string[] = []
+) => createQuery(name, dataType, variables, returnProperties, 'mutation');
 
 export const appQuery = (
   flux: FluxFramework,
@@ -212,7 +221,11 @@ export const publicMutation = <T>(
   return getGraphql(flux, publicUrl, false, query, options) as Promise<T>;
 };
 
-export const uploadImage = (flux: FluxFramework, image, options: HunterOptionsType = {}): Promise<ApiResultsType> => {
+export const uploadImage = (
+  flux: FluxFramework,
+  image,
+  options: HunterOptionsType = {}
+): Promise<ApiResultsType> => {
   const token = flux.getState('user.session.token');
   const headers = new Headers();
   headers.set('Authorization', `Bearer ${token}`);
@@ -220,7 +233,11 @@ export const uploadImage = (flux: FluxFramework, image, options: HunterOptionsTy
   return post(uploadImageUrl, image, {headers, ...options});
 };
 
-export const refreshSession = async (flux: FluxFramework, token?: string, expires: number = 15): Promise<ApiResultsType> => {
+export const refreshSession = async (
+  flux: FluxFramework,
+  token?: string,
+  expires: number = 15
+): Promise<FluxAction | null> => {
   const refreshToken = isEmpty(token) ? token : flux.getState('user.session.token');
 
   if(isEmpty(refreshToken)) {

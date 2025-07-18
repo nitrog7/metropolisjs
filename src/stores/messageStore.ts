@@ -55,6 +55,6 @@ export const messageStore = (type: string, data: {
 
 export const messages = {
   action: messageStore,
-  name: 'message',
-  initialState: defaultValues
+  initialState: defaultValues,
+  name: 'message'
 };

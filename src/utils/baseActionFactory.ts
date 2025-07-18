@@ -3,6 +3,8 @@
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
 
+import {createValidatorManager} from './validatorFactory';
+
 import type {BaseAdapterOptions} from './validatorFactory';
 import type {FluxFramework} from '@nlabs/arkhamjs';
 
@@ -32,7 +34,6 @@ export const createBaseActions = <T extends BaseAdapterOptions>(
   defaultValidator: (input: unknown, options?: T) => any,
   options?: BaseActionOptions<T>
 ) => {
-  const {createValidatorManager} = require('./validatorFactory');
   const {validator, updateAdapter, updateOptions} = createValidatorManager(
     defaultValidator,
     options?.adapterOptions
@@ -142,11 +143,11 @@ export const createBaseActions = <T extends BaseAdapterOptions>(
   };
 
   return {
-    validator,
-    updateAdapter,
-    updateOptions,
     createMutationAction,
     createQueryAction,
-    flux
+    flux,
+    updateAdapter,
+    updateOptions,
+    validator
   };
 };

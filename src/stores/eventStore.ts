@@ -45,6 +45,6 @@ export const eventStore = (type: string, data: {
 
 export const events = {
   action: eventStore,
-  name: 'event',
-  initialState: defaultValues
+  initialState: defaultValues,
+  name: 'event'
 };

@@ -2,10 +2,7 @@
  * Copyright (c) 2019-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import capitalize from 'lodash/capitalize';
-import orderBy from 'lodash/orderBy';
-import pullAllBy from 'lodash/pullAllBy';
-import uniqBy from 'lodash/uniqBy';
+import {capitalize, orderBy, pullAllBy, uniqBy} from '@nlabs/utils';
 
 import {REACTION_CONSTANTS} from './reactionStore';
 import {TAG_CONSTANTS} from './tagStore';
@@ -24,18 +21,18 @@ export const USER_CONSTANTS = {
   FORGOT_PASSWORD_ERROR: 'USER_FORGOT_PASSWORD_ERROR',
   FORGOT_PASSWORD_SUCCESS: 'USER_FORGOT_PASSWORD_SUCCESS',
   GET_DETAILS_SUCCESS: 'USER_GET_DETAILS_SUCCESS',
+  GET_ITEM_ERROR: 'USER_GET_ITEM_ERROR',
+  GET_ITEM_SUCCESS: 'USER_GET_ITEM_SUCCESS',
   GET_LIST_ERROR: 'USER_GET_LIST_ERROR',
   GET_LIST_SUCCESS: 'USER_GET_LIST_SUCCESS',
   GET_SESSION_ERROR: 'USER_GET_SESSION_ERROR',
   GET_SESSION_SUCCESS: 'USER_GET_SESSION_SUCCESS',
-  GET_ITEM_ERROR: 'USER_GET_ITEM_ERROR',
-  GET_ITEM_SUCCESS: 'USER_GET_ITEM_SUCCESS',
   HAS_USER_REACTIONS: 'USER_HAS_USER_REACTIONS',
-  REMOVE_RELATION: 'USER_REMOVE_RELATION',
   RECOVERY_ERROR: 'USER_RECOVERY_ERROR',
   RECOVERY_SUCCESS: 'USER_RECOVERY_SUCCESS',
   REMOVE_ITEM_ERROR: 'USER_REMOVE_ITEM_ERROR',
   REMOVE_ITEM_SUCCESS: 'USER_REMOVE_ITEM_SUCCESS',
+  REMOVE_RELATION: 'USER_REMOVE_RELATION',
   RESEND_CODE_ERROR: 'USER_RESEND_CODE_ERROR',
   RESEND_CODE_SUCCESS: 'USER_RESEND_CODE_SUCCESS',
   RESET_PASSWORD_ERROR: 'USER_RESET_PASSWORD_ERROR',
@@ -44,16 +41,16 @@ export const USER_CONSTANTS = {
   SIGN_IN_SUCCESS: 'USER_SIGN_IN_SUCCESS',
   SIGN_OUT_ERROR: 'USER_SIGN_OUT_ERROR',
   SIGN_OUT_SUCCESS: 'USER_SIGN_OUT_SUCCESS',
+  SIGN_UP_ERROR: 'USER_SIGN_UP_ERROR',
+  SIGN_UP_SUCCESS: 'USER_SIGN_UP_SUCCESS',
   UPDATE_ITEM_ERROR: 'USER_UPDATE_ITEM_ERROR',
   UPDATE_ITEM_SUCCESS: 'USER_UPDATE_ITEM_SUCCESS',
   UPDATE_PERSONA_ERROR: 'USER_UPDATE_PERSONA_ERROR',
   UPDATE_PERSONA_SUCCESS: 'USER_UPDATE_PERSONA_SUCCESS',
   UPDATE_SESSION_ERROR: 'USER_UPDATE_SESSION_ERROR',
   UPDATE_SESSION_SUCCESS: 'USER_UPDATE_SESSION_SUCCESS',
-  VERIFY_SUCCESS: 'USER_VERIFY_SUCCESS',
   VERIFY_ERROR: 'USER_VERIFY_ERROR',
-  SIGN_UP_SUCCESS: 'USER_SIGN_UP_SUCCESS',
-  SIGN_UP_ERROR: 'USER_SIGN_UP_ERROR'
+  VERIFY_SUCCESS: 'USER_VERIFY_SUCCESS'
 } as const;
 
 export type UserConstantsType = typeof USER_CONSTANTS[keyof typeof USER_CONSTANTS];
@@ -94,7 +91,7 @@ export const userStore = (type: string, data: UserData, state = defaultValues): 
     case REACTION_CONSTANTS.REMOVE_ITEM_SUCCESS: {
       const {itemId, itemType, reaction} = data;
 
-      if(itemType !== 'users') {
+      if(itemType !== 'users' || !reaction) {
         return state;
       }
 
@@ -102,19 +99,25 @@ export const userStore = (type: string, data: UserData, state = defaultValues): 
       const {name: reactionName, value: reactionValue} = reaction;
       const value: boolean = reactionValue === 'true';
 
-      users[itemId][`has${capitalize(reactionName)}`] = value;
+      if(itemId && users[itemId]) {
+        users[itemId][`has${capitalize(reactionName)}`] = value;
 
-      if(reactionName !== 'view') {
-        const countField: keyof typeof countFieldMap = reactionName as keyof typeof countFieldMap;
-        const field = countFieldMap[countField];
-        users[itemId][field] = value ? (users[itemId][field] as number || 0) + 1 : (users[itemId][field] as number || 0) - 1;
+        if(reactionName !== 'view') {
+          const countField: keyof typeof countFieldMap = reactionName as keyof typeof countFieldMap;
+          const field = countFieldMap[countField];
+          const currentCount = users[itemId][field] as number || 0;
+          users[itemId][field] = value ? currentCount + 1 : currentCount - 1;
+        }
       }
 
       return {...state, users};
     }
     case USER_CONSTANTS.UPDATE_SESSION_SUCCESS: {
       const {user} = data;
-      return {...state, session: {...state.session, ...user}};
+      if(user) {
+        return {...state, session: {...state.session, ...user}};
+      }
+      return state;
     }
     case TAG_CONSTANTS.ADD_PROFILE_SUCCESS: {
       const {tag} = data;
@@ -133,41 +136,61 @@ export const userStore = (type: string, data: UserData, state = defaultValues): 
     }
     case USER_CONSTANTS.ADD_ITEM_SUCCESS: {
       const {user} = data;
-      const {users} = state;
-      users[user.userId] = {...user.toJson(), timestamp: Date.now()};
-      return {...state, users, session: user};
+      if(user && user.userId) {
+        const {users} = state;
+        users[user.userId] = {...user.toJson(), timestamp: Date.now()};
+        return {...state, session: user, users};
+      }
+      return state;
     }
     case USER_CONSTANTS.GET_DETAILS_SUCCESS: {
       const {user} = data;
-      const {users} = state;
-      users[user.userId] = {...user.toJson(), timestamp: Date.now()};
-      return {...state, users};
+      if(user && user.userId) {
+        const {users} = state;
+        users[user.userId] = {...user.toJson(), timestamp: Date.now()};
+        return {...state, users};
+      }
+      return state;
     }
     case USER_CONSTANTS.GET_LIST_SUCCESS: {
       const {list} = data;
-      const {users} = state;
+      if(list) {
+        const {users} = state;
 
-      list.forEach((user: User) => {
-        const cachedUser: Partial<User> = users[user.userId] || {};
-        users[user.userId] = {...cachedUser, ...user.toJson()};
-      });
-      return {...state, users};
+        list.forEach((user: User) => {
+          if(user.userId) {
+            const cachedUser: Partial<User> = users[user.userId] || {};
+            users[user.userId] = {...cachedUser, ...user.toJson()};
+          }
+        });
+        return {...state, users};
+      }
+      return state;
     }
     case USER_CONSTANTS.SIGN_IN_ERROR: {
       const {username} = state.session;
-      return {...state, session: {username}};
+      return {...state, session: {username: username || ''}};
     }
     case USER_CONSTANTS.SIGN_IN_SUCCESS: {
       const {session} = data;
-      return {...state, lists: {}, session, users: {}};
+      if(session) {
+        return {...state, lists: {}, session, users: {}};
+      }
+      return state;
     }
     case USER_CONSTANTS.RESEND_CODE_ERROR: {
       const {session} = data;
-      return {...state, session: {...state.session, ...session.toJson()}};
+      if(session) {
+        return {...state, session: {...state.session, ...session.toJson()}};
+      }
+      return state;
     }
     case USER_CONSTANTS.RESEND_CODE_SUCCESS: {
       const {session} = data;
-      return {...state, session: {...state.session, ...session.toJson()}};
+      if(session) {
+        return {...state, session: {...state.session, ...session.toJson()}};
+      }
+      return state;
     }
     case USER_CONSTANTS.GET_SESSION_SUCCESS: {
       const {session} = data;
@@ -175,13 +198,19 @@ export const userStore = (type: string, data: UserData, state = defaultValues): 
     }
     case USER_CONSTANTS.UPDATE_ITEM_SUCCESS: {
       const {user} = data;
-      const {session, users} = state;
-      return {...state, session: {...session, ...user.toJson()}, users: {...users, [user.userId]: user.toJson()}};
+      if(user && user.userId) {
+        const {session, users} = state;
+        return {...state, session: {...session, ...user.toJson()}, users: {...users, [user.userId]: user.toJson()}};
+      }
+      return state;
     }
     case USER_CONSTANTS.UPDATE_PERSONA_SUCCESS: {
       const {persona} = data;
-      const {session} = state;
-      return {...state, session: {...session, ...persona.toJson()}};
+      if(persona) {
+        const {session} = state;
+        return {...state, session: {...session, ...persona.toJson()}};
+      }
+      return state;
     }
     default: {
       return state;
@@ -191,6 +220,6 @@ export const userStore = (type: string, data: UserData, state = defaultValues): 
 
 export const users = {
   action: userStore,
-  name: 'user',
-  initialState: defaultValues
+  initialState: defaultValues,
+  name: 'user'
 };

@@ -1,11 +1,9 @@
-import isObject from 'lodash/isObject';
-import isString from 'lodash/isString';
 import {DateTime} from 'luxon';
 
-export const parseDateTime = (value: string | DateTime | number) => {
-  if(isString(value)) {
+export const parseDateTime = (value: string | number | DateTime) => {
+  if(typeof value === 'string') {
     return DateTime.fromISO(value).toMillis();
-  } else if(isObject(value)) {
+  } else if(value instanceof DateTime) {
     return (value as DateTime).toMillis();
   }
 

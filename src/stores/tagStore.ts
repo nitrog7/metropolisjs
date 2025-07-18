@@ -46,6 +46,6 @@ export const tagStore = (type: string, data: {tags?: TagState['list']}, state = 
 
 export const tags = {
   action: tagStore,
-  name: 'tag',
-  initialState: defaultValues
+  initialState: defaultValues,
+  name: 'tag'
 };

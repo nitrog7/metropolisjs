@@ -6,8 +6,8 @@
 export const WEBSOCKET_CONSTANTS = {
   CLOSE: 'WEBSOCKET_CLOSE',
   ERROR: 'WEBSOCKET_ERROR',
-  OPEN: 'WEBSOCKET_OPEN',
-  MESSAGE: 'WEBSOCKET_MESSAGE'
+  MESSAGE: 'WEBSOCKET_MESSAGE',
+  OPEN: 'WEBSOCKET_OPEN'
 } as const;
 
 interface WebSocketState {
@@ -39,6 +39,6 @@ export const websocketStore = (type: string, data: Partial<WebSocketState>, stat
 
 export const websocket = {
   action: websocketStore,
-  name: 'websocket',
-  initialState: defaultValues
+  initialState: defaultValues,
+  name: 'websocket'
 };

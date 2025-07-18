@@ -124,7 +124,7 @@ export const createMessageActions = (
 
       const onSuccess = (data: ApiResultsType = {}) => {
         const {sendMessage: message = {}} = data;
-        const sessionId: string = flux.getState('user.session.userId', '');
+        //const sessionId: string = flux.getState('user.session.userId', '');
         return flux.dispatch({message, type: MESSAGE_CONSTANTS.ADD_ITEM_SUCCESS});
       };
 
@@ -183,7 +183,7 @@ export const createMessageActions = (
 
       const onSuccess = (data: ApiResultsType = {}) => {
         const {messages = []} = data as {messages: MessageType[]};
-        const sessionId: string = flux.getState('user.session.userId', '');
+        //const sessionId: string = flux.getState('user.session.userId', '');
 
         return flux.dispatch({
           conversationId,

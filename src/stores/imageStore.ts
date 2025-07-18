@@ -49,6 +49,6 @@ export const imageStore = (type: string, data: {
 
 export const images = {
   action: imageStore,
-  name: 'image',
-  initialState: defaultValues
+  initialState: defaultValues,
+  name: 'image'
 };

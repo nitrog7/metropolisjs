@@ -1,21 +1,21 @@
 import {useFlux} from '@nlabs/arkhamjs-utils-react';
 import {useContext, useMemo} from 'react';
 
-import {MetropolisContext} from './MetropolisProvider';
 import {createAllActions} from '../utils/actionFactory';
+import {MetropolisContext} from './MetropolisProvider';
 
 export const useMetropolis = () => {
   const flux = useFlux();
   const {adapters} = useContext(MetropolisContext);
   const {
-    eventAdapter,
-    imageAdapter,
-    locationAdapter,
-    messageAdapter,
-    postAdapter,
-    reactionAdapter,
-    tagAdapter,
-    userAdapter
+    Event: eventAdapter,
+    Image: imageAdapter,
+    Location: locationAdapter,
+    Message: messageAdapter,
+    Post: postAdapter,
+    Reaction: reactionAdapter,
+    Tag: tagAdapter,
+    User: userAdapter
   } = adapters || {};
 
   return useMemo(() => {

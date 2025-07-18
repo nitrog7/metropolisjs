@@ -40,6 +40,6 @@ export const locationStore = (type: string, data: {current?: LocationType}, stat
 
 export const locations = {
   action: locationStore,
-  name: 'location',
-  initialState: defaultValues
+  initialState: defaultValues,
+  name: 'location'
 };

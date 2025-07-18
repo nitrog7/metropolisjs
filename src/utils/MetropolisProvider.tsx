@@ -2,7 +2,7 @@
  * Copyright (c) 2021-Present, Nitrogen Labs, Inc.
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
-import React, {createContext} from 'react';
+import {createContext} from 'react';
 
 import {parseEvent, parseImage, parseLocation, parseMessage, parsePost, parseReaction, parseTag, parseUser} from '../adapters';
 
@@ -31,17 +31,25 @@ export interface MetropolisProviderProps {
   readonly updateNotification: (notification: Notification) => void;
 }
 
-const isAuth = () => true;
-
-export const MetropolisContext = createContext({
+const defaultContext: {
+  adapters: MetropolisAdapters | undefined;
+  isAuth: () => boolean;
+  messages: MessageType[];
+  notifications: Notification[];
+  session: SessionType;
+  updateMessage: (message: MessageType) => void;
+  updateNotification: (notification: Notification) => void;
+} = {
   adapters: undefined,
-  isAuth,
+  isAuth: () => true,
   messages: [],
   notifications: [],
   session: {},
-  updateMessage: (message) => message,
-  updateNotification: (notification) => notification
-});
+  updateMessage: (message: MessageType) => message,
+  updateNotification: (notification: Notification) => notification
+};
+
+export const MetropolisContext = createContext(defaultContext);
 
 export const MetropolisProvider = ({
   adapters,
@@ -56,10 +64,10 @@ export const MetropolisProvider = ({
   <MetropolisContext.Provider
     value={{
       adapters,
-      isAuth,
-      messages,
-      session,
-      notifications,
+      isAuth: isAuth || (() => true),
+      messages: messages || [],
+      notifications: notifications || [],
+      session: session || {},
       updateMessage,
       updateNotification
     }}>

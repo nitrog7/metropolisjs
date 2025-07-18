@@ -16,7 +16,6 @@ import {createTagActions} from '../actions/tagActions/tagActions';
 import {createUserActions} from '../actions/userActions/userActions';
 import {createWebsocketActions} from '../actions/websocketActions/websocketActions';
 
-import type {FluxFramework} from '@nlabs/arkhamjs';
 import type {EventActionsOptions} from '../actions/eventActions/eventActions';
 import type {ImageActionsOptions} from '../actions/imageActions/imageActions';
 import type {LocationActionsOptions} from '../actions/locationActions/locationActions';
@@ -26,6 +25,7 @@ import type {ReactionActionsOptions} from '../actions/reactionActions/reactionAc
 import type {SSEActionsOptions} from '../actions/sseActions/sseActions';
 import type {TagActionsOptions} from '../actions/tagActions/tagActions';
 import type {UserActionsOptions} from '../actions/userActions/userActions';
+import type {FluxFramework} from '@nlabs/arkhamjs';
 
 export type ActionType =
   | 'event'

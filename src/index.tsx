@@ -6,7 +6,7 @@ import {useFlux} from '@nlabs/arkhamjs-utils-react';
 import React, {useEffect, useState} from 'react';
 
 import {createWebsocketActions} from './actions/websocketActions/websocketActions';
-import {Config, MetropolisConfiguration} from './config';
+import {Config, type MetropolisConfiguration} from './config';
 import {
   app,
   events,
@@ -19,11 +19,12 @@ import {
   websocket
 } from './stores';
 import {refreshSession} from './utils/api';
-import {MetropolisAdapters, MetropolisContext} from './utils/MetropolisProvider';
+import {MetropolisContext, type MetropolisAdapters} from './utils/MetropolisProvider';
 
 import type {FluxFramework} from '@nlabs/arkhamjs';
 
-export {MetropolisConfiguration} from './config';
+export type {MetropolisConfiguration} from './config';
+export type {MetropolisAdapters} from './utils/MetropolisProvider';
 
 export const onInit = (flux: FluxFramework) => {
   try {
@@ -42,7 +43,7 @@ export const onInit = (flux: FluxFramework) => {
     console.log({token});
 
     if(token) {
-      refreshSession(flux, token);
+      refreshSession(flux, token as string);
     }
     // wsInit();
   } catch(error) {
@@ -51,7 +52,7 @@ export const onInit = (flux: FluxFramework) => {
 };
 
 export * from './stores';
-// Export specific utilities from api to avoid SessionType conflict
+
 export {
   appMutation,
   appQuery,

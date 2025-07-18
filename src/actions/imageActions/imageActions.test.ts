@@ -1,19 +1,19 @@
-import {FluxFramework} from '@nlabs/arkhamjs';
-import {post} from '@nlabs/rip-hunter';
-
-import {Config} from '../../config';
-import {createImageActions} from './imageActions';
-
-// Mock the post function
-jest.mock('@nlabs/rip-hunter', () => ({
-  ...jest.requireActual('@nlabs/rip-hunter'),
+jest.unstable_mockModule('@nlabs/rip-hunter', () => ({
+  ...(jest.requireActual('@nlabs/rip-hunter') as any),
+  ApiError: jest.fn(),
+  graphqlQuery: jest.fn(),
   post: jest.fn()
 }));
 
-// Mock the convertFileToBase64 function to avoid timeouts
-jest.mock('../../utils/file', () => ({
-  convertFileToBase64: jest.fn().mockResolvedValue('data:image/png;base64,mockbase64string')
+jest.unstable_mockModule('../../utils/file', () => ({
+  convertFileToBase64: jest.fn().mockResolvedValue('data:image/png;base64,mockbase64string' as never)
 }));
+
+import {jest} from '@jest/globals';
+import {FluxFramework} from '@nlabs/arkhamjs';
+import {post} from '@nlabs/rip-hunter';
+import {Config} from '../../config';
+import {createImageActions} from './imageActions';
 
 describe('imageActions with mocked HTTP requests', () => {
   let flux: FluxFramework;
@@ -24,11 +24,11 @@ describe('imageActions with mocked HTTP requests', () => {
     flux = new FluxFramework();
     imageActions = createImageActions(flux);
 
-    flux.dispatch = jest.fn();
-    flux.getState = jest.fn().mockReturnValue('mock-token');
+    flux.dispatch = jest.fn() as any;
+    flux.getState = jest.fn().mockReturnValue('mock-token' as never) as any;
 
     mockPost = post as jest.MockedFunction<typeof post>;
-    mockPost.mockClear();
+    // mockPost.mockClear();
 
     Config.setConfig({
       app: {
@@ -38,6 +38,8 @@ describe('imageActions with mocked HTTP requests', () => {
       }
     });
   });
+
+  afterAll(jest.restoreAllMocks);
 
   describe('upload functionality', () => {
     it('should mock post request for image upload', async () => {
@@ -111,9 +113,9 @@ describe('imageActions with mocked HTTP requests', () => {
 
       // Get the headers that were passed to post
       const callArgs = mockPost.mock.calls[0];
-      const headers = callArgs[2].headers;
+      const headers = callArgs[2]?.headers;
 
-      expect(headers.get('Authorization')).toBe('Bearer mock-token');
+      expect(headers?.get('Authorization')).toBe('Bearer mock-token');
     });
   });
 

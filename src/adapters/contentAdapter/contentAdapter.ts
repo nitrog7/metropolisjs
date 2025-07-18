@@ -44,7 +44,7 @@ const contentSchema = z.object({
   contentId: z.string().optional(),
   key: z.string().min(1, 'Key is required').max(200, 'Key must be less than 200 characters'),
   locale: z.enum(['en', 'es', 'fr', 'de', 'pt', 'it'], {
-    invalid_type_error: 'Locale must be one of: en, es, fr, de, pt, it'
+    message: 'Locale must be one of: en, es, fr, de, pt, it'
   }),
   content: z.string().min(1, 'Content is required').max(10000, 'Content must be less than 10000 characters'),
   description: z.string().max(500, 'Description must be less than 500 characters').optional(),
@@ -57,7 +57,7 @@ const contentInputSchema = z.object({
   contentId: z.string().optional(),
   key: z.string().min(1, 'Key is required').max(200, 'Key must be less than 200 characters'),
   locale: z.enum(['en', 'es', 'fr', 'de', 'pt', 'it'], {
-    invalid_type_error: 'Locale must be one of: en, es, fr, de, pt, it'
+    message: 'Locale must be one of: en, es, fr, de, pt, it'
   }).optional(),
   content: z.string().min(1, 'Content is required').max(10000, 'Content must be less than 10000 characters'),
   description: z.string().max(500, 'Description must be less than 500 characters').optional(),

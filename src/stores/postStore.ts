@@ -32,8 +32,12 @@ export const postStore = (type: string, data: {post?: PostType}, state = default
     case POST_CONSTANTS.GET_ITEM_SUCCESS: {
       const {viewed} = state;
       const {post} = data;
-      viewed[post.postId] = {...post, cached: Date.now()} as PostType;
-      return {...state, viewed};
+      if(post && post.postId) {
+        const postWithCache: PostType = {...post, cached: Date.now()};
+        viewed[post.postId] = postWithCache;
+        return {...state, viewed};
+      }
+      return state;
     }
     default: {
       return state;
@@ -43,6 +47,6 @@ export const postStore = (type: string, data: {post?: PostType}, state = default
 
 export const posts = {
   action: postStore,
-  name: 'post',
-  initialState: defaultValues
+  initialState: defaultValues,
+  name: 'post'
 };

@@ -241,8 +241,8 @@ export const createTagActions = (
   };
 
   const getTags = async (tagProps: string[] = []): Promise<TagType[]> => {
-    const initialTags: TagType[] = flux.getState('tag.list', []);
-    const cacheExpires: number = flux.getState('tag.expires', 0);
+    const initialTags: TagType[] = flux.getState('tag.list', []) as TagType[];
+    const cacheExpires: number = flux.getState('tag.expires', 0) as number;
     const now: number = Date.now();
 
     if(initialTags.length && now < cacheExpires) {

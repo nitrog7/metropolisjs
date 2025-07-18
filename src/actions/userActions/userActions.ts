@@ -404,7 +404,7 @@ export const createUserActions = (
   ;
 
   const isLoggedIn = (): boolean => {
-    const expires: number = flux.getState('user.session.expires');
+    const expires: number = flux.getState('user.session.expires') as number;
 
     if(!expires) {
       return false;

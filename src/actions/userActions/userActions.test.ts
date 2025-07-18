@@ -1,3 +1,9 @@
+jest.unstable_mockModule('@nlabs/rip-hunter', () => ({
+  graphqlQuery: jest.fn(),
+  ApiError: jest.fn()
+}));
+
+import {jest} from '@jest/globals';
 import {FluxFramework} from '@nlabs/arkhamjs';
 import {DateTime} from 'luxon';
 
@@ -5,9 +11,6 @@ import {Config} from '../../config';
 import {createAction} from '../../utils/actionFactory';
 
 import type {UserAdapterOptions} from './userActions';
-
-// Mock @nlabs/rip-hunter to ensure HTTP requests are intercepted
-jest.mock('@nlabs/rip-hunter');
 
 describe('userActions', () => {
   let flux: FluxFramework;
@@ -17,9 +20,13 @@ describe('userActions', () => {
     flux = new FluxFramework();
     userActions = createAction('user', flux);
 
-    flux.dispatch = jest.fn();
-    flux.getState = jest.fn();
+    flux.dispatch = jest.fn() as any;
+    flux.getState = jest.fn() as any;
+
+
   });
+
+  afterAll(jest.restoreAllMocks);
 
   describe('factory function', () => {
     it('should create actions with flux framework', () => {
@@ -34,7 +41,7 @@ describe('userActions', () => {
     });
 
     it('should merge custom adapter with default behavior', () => {
-      const customUserAdapter = jest.fn().mockImplementation((input) => {
+      const customUserAdapter = jest.fn().mockImplementation((input: any) => {
         // input is already validated by default adapter
         if(input.email && !input.email.includes('@company.com')) {
           throw new Error('Only company emails allowed');
@@ -66,7 +73,7 @@ describe('userActions', () => {
 
   describe('adapter updates', () => {
     it('should update user adapter at runtime', () => {
-      const customAdapter = jest.fn().mockImplementation((input) =>
+      const customAdapter = jest.fn().mockImplementation((input: any) =>
         // input is already validated by default adapter
         ({...input, customField: true})
       );
@@ -77,7 +84,7 @@ describe('userActions', () => {
     });
 
     it('should update persona adapter at runtime', () => {
-      const customAdapter = jest.fn().mockImplementation((input) =>
+      const customAdapter = jest.fn().mockImplementation((input: any) =>
         // input is already validated by default adapter
         ({...input, customField: true})
       );

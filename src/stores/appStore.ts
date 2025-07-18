@@ -27,6 +27,6 @@ export const appStore = (type: string, data: Partial<AppState>, state = defaultV
 
 export const app = {
   action: appStore,
-  name: 'app',
-  initialState: defaultValues
+  initialState: defaultValues,
+  name: 'app'
 };

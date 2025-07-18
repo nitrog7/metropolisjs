@@ -34,11 +34,11 @@ export const createValidatorFactory = <T extends BaseAdapterOptions>(
   const mergedOptions = {...options, ...validatorOptions};
 
   // Start with default validation
-  let validated = defaultValidator(input, mergedOptions);
+  let validated = defaultValidator(input, mergedOptions as T);
 
   // Apply custom validation if provided
   if(customAdapter) {
-    validated = customAdapter(validated, mergedOptions);
+    validated = customAdapter(validated, mergedOptions as T);
   }
 
   // Apply custom validation from options if provided
@@ -65,9 +65,13 @@ export const createValidatorFactory = <T extends BaseAdapterOptions>(
  */
 export const createValidatorManager = <T extends BaseAdapterOptions>(
   defaultValidator: (input: unknown, options?: T) => any,
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   initialOptions: T = {} as T
 ) => {
-  let adapterOptions: T = {...initialOptions};
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const defaultOptions: T = {} as T;
+
+  let adapterOptions: T = {...defaultOptions, ...initialOptions};
   let customAdapter: ((input: unknown, options?: T) => any) | undefined;
 
   let validator = createValidatorFactory(defaultValidator, customAdapter, adapterOptions);
@@ -78,15 +82,20 @@ export const createValidatorManager = <T extends BaseAdapterOptions>(
   };
 
   const updateOptions = (options: T): void => {
-    adapterOptions = {...adapterOptions, ...options};
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    adapterOptions = {...adapterOptions, ...options} as T;
     validator = createValidatorFactory(defaultValidator, customAdapter, adapterOptions);
   };
 
   return {
-    validator,
+    getCustomAdapter: () => customAdapter,
+    getOptions: () => {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      const options: T = {...adapterOptions} as T;
+      return options;
+    },
     updateAdapter,
     updateOptions,
-    getOptions: () => ({...adapterOptions}),
-    getCustomAdapter: () => customAdapter
+    validator
   };
 };

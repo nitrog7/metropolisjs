@@ -11,6 +11,7 @@ import {appMutation} from '../../utils/api';
 import {autoCompleteLocation} from '../../utils/location';
 
 import type {FluxFramework} from '@nlabs/arkhamjs';
+import type {User} from '../../adapters';
 import type {LocationType} from '../../adapters/locationAdapter/locationAdapter';
 import type {ApiResultsType, ReaktorDbCollection} from '../../utils/api';
 
@@ -202,8 +203,8 @@ export const createLocationActions = (
   };
 
   const getCurrentLocation = async (setLocation?: (location: LocationType) => void): Promise<LocationType> => new Promise((resolve, reject) => {
-    const {userId} = flux.getState('user.session', {});
-    const {city, country, latitude, longitude, state} = flux.getState(['user', 'users', userId], {});
+    const {userId}: User = flux.getState('user.session', {});
+    const {city, country, latitude, longitude, state}: User = flux.getState(['user', 'users', userId], {});
     const locationStr: string = [city, state, country].join(', ');
     const profileLocation = {
       latitude,
