@@ -7,11 +7,11 @@ export default {
   },
   entryJS: 'app.tsx',
   gitUrl: 'https://github.com/nitrogenlabs/metropolisjs',
-  outputPath: 'lib',
   jest: {
     testEnvironment: 'jsdom'
   },
+  outputPath: 'lib',
   targetEnvironment: 'web',
-  useTypescript: true,
-  useESM: true
+  useESM: true,
+  useTypescript: true
 };
