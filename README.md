@@ -1,10 +1,13 @@
-# 🏙️ MetropolisJS
+# MetropolisJS: Seamless Frontend-Backend Integration Framework
 
 > **The Ultimate Frontend Integration Library for Modern Web Applications**
 
-[![npm version](https://badge.fury.io/js/%40nlabs%2Fmetropolisjs.svg)](https://badge.fury.io/js/%40nlabs%2Fmetropolisjs)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![npm version](https://img.shields.io/npm/v/@nlabs/metropolisjs.svg?style=flat-square)](https://www.npmjs.com/package/@nlabs/metropolisjs)
+[![npm downloads](https://img.shields.io/npm/dm/@nlabs/metropolisjs.svg?style=flat-square)](https://www.npmjs.com/package/@nlabs/metropolisjs)
+[![Issues](http://img.shields.io/github/issues/nitrogenlabs/metropolisjs.svg?style=flat-square)](https://github.com/nitrogenlabs/metropolisjs/issues)
+[![TypeScript](https://badges.frapsoft.com/typescript/version/typescript-next.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
+[![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](http://opensource.org/licenses/MIT)
+[![Chat](https://img.shields.io/discord/446122412715802649.svg)](https://discord.gg/Ttgev58)
 
 MetropolisJS is the bridge that connects your frontend dreams to backend reality. Built on the powerful combination of **Reaktor** (backend services) and **ArkhamJS** (frontend data store), MetropolisJS provides a seamless, real-time integration layer that handles everything from user authentication to real-time messaging and notifications.
 
