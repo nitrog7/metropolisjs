@@ -140,7 +140,7 @@ export const userStore = (type: string, data: UserData, state = defaultValues): 
       const {user} = data;
       if(user && user.userId) {
         const {users} = state;
-        users[user.userId] = {...user.toJson(), timestamp: Date.now()};
+        users[user.userId] = {...user, timestamp: Date.now()};
         return {...state, session: user, users};
       }
       return state;
@@ -149,7 +149,7 @@ export const userStore = (type: string, data: UserData, state = defaultValues): 
       const {user} = data;
       if(user && user.userId) {
         const {users} = state;
-        users[user.userId] = {...user.toJson(), timestamp: Date.now()};
+        users[user.userId] = {...user, timestamp: Date.now()};
         return {...state, users};
       }
       return state;
@@ -162,7 +162,7 @@ export const userStore = (type: string, data: UserData, state = defaultValues): 
         list.forEach((user: User) => {
           if(user.userId) {
             const cachedUser: Partial<User> = users[user.userId] || {};
-            users[user.userId] = {...cachedUser, ...user.toJson()};
+            users[user.userId] = {...cachedUser, ...user};
           }
         });
         return {...state, users};
@@ -188,7 +188,7 @@ export const userStore = (type: string, data: UserData, state = defaultValues): 
       const {user} = data;
       if(user && user.userId) {
         const {users} = state;
-        users[user.userId] = {...user.toJson(), timestamp: Date.now()};
+        users[user.userId] = {...user, timestamp: Date.now()};
         return {...state, error: undefined, users};
       }
       return state;
@@ -196,14 +196,14 @@ export const userStore = (type: string, data: UserData, state = defaultValues): 
     case USER_CONSTANTS.RESEND_CODE_ERROR: {
       const {session} = data;
       if(session) {
-        return {...state, session: {...state.session, ...session.toJson()}};
+        return {...state, session: {...state.session, ...session}};
       }
       return state;
     }
     case USER_CONSTANTS.RESEND_CODE_SUCCESS: {
       const {session} = data;
       if(session) {
-        return {...state, session: {...state.session, ...session.toJson()}};
+        return {...state, session: {...state.session, ...session}};
       }
       return state;
     }
@@ -215,7 +215,7 @@ export const userStore = (type: string, data: UserData, state = defaultValues): 
       const {user} = data;
       if(user && user.userId) {
         const {session, users} = state;
-        return {...state, session: {...session, ...user.toJson()}, users: {...users, [user.userId]: user.toJson()}};
+        return {...state, session: {...session, ...user}, users: {...users, [user.userId]: user}};
       }
       return state;
     }
@@ -223,7 +223,7 @@ export const userStore = (type: string, data: UserData, state = defaultValues): 
       const {persona} = data;
       if(persona) {
         const {session} = state;
-        return {...state, session: {...session, ...persona.toJson()}};
+        return {...state, session: {...session, ...persona}};
       }
       return state;
     }

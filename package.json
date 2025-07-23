@@ -51,8 +51,10 @@
   "dependencies": {
     "@nlabs/rip-hunter": "3.0.0",
     "@nlabs/utils": "^2.7.6",
+    "i18next": "^25.3.2",
     "luxon": "^3.7.1",
     "p-debounce": "^4.0.0",
+    "react-i18next": "^15.6.1",
     "sockette": "^2.0.6",
     "zod": "^4.0.5"
   },

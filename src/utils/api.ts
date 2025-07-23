@@ -30,6 +30,7 @@ export type ReaktorDbCollection =
   'reactions' |
   'subscriptions' |
   'tags' |
+  'translations' |
   'users';
 
 export interface ApiQueryVariableType {

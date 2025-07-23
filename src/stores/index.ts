@@ -12,6 +12,7 @@ export {POST_CONSTANTS, posts} from './postStore';
 export {PROFILE_CONSTANTS, profiles} from './profileStore';
 export {REACTION_CONSTANTS, reactions} from './reactionStore';
 export {TAG_CONSTANTS, tags} from './tagStore';
+export {TRANSLATION_CONSTANTS, translations} from './translationStore';
 export {USER_CONSTANTS, users} from './userStore';
 export {websocket, WEBSOCKET_CONSTANTS} from './websocketStore';
 

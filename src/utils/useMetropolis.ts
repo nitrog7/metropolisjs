@@ -17,6 +17,7 @@ export const useMetropolis = () => {
     Profile: profileAdapter,
     Reaction: reactionAdapter,
     Tag: tagAdapter,
+    Translation: translationAdapter,
     User: userAdapter
   } = adapters || {};
 
@@ -31,6 +32,7 @@ export const useMetropolis = () => {
       profile,
       reaction,
       tag,
+      translation,
       user,
       websocket
     } = createAllActions(flux, {
@@ -43,6 +45,7 @@ export const useMetropolis = () => {
       profile: profileAdapter ? {profileAdapter: profileAdapter as any} : undefined,
       reaction: reactionAdapter ? {reactionAdapter: reactionAdapter as any} : undefined,
       tag: tagAdapter ? {tagAdapter: tagAdapter as any} : undefined,
+      translation: translationAdapter ? {translationAdapter: translationAdapter as any} : undefined,
       user: userAdapter ? {userAdapter: userAdapter as any} : undefined
     });
 
@@ -56,6 +59,7 @@ export const useMetropolis = () => {
       profileActions: profile,
       reactionActions: reaction,
       tagActions: tag,
+      translationActions: translation,
       userActions: user,
       websocketActions: websocket
     };
@@ -70,6 +74,7 @@ export const useMetropolis = () => {
     profileAdapter,
     reactionAdapter,
     tagAdapter,
+    translationAdapter,
     userAdapter
   ]);
 };

@@ -13,6 +13,10 @@ export default Config.create({
   },
   gitUrl: 'https://github.com/nitrogenlabs/metropolisjs',
   jest: {
+    extensionsToTreatAsEsm: ['.ts', '.tsx'],
+    moduleNameMapper: {
+      '^@nlabs/(.*)$': '<rootDir>/node_modules/@nlabs/$1'
+    },
     testEnvironment: 'jsdom'
   },
   outputPath: 'lib',

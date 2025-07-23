@@ -3,7 +3,9 @@
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
 import {useFlux} from '@nlabs/arkhamjs-utils-react';
+import i18n from 'i18next';
 import React, {useEffect} from 'react';
+import {I18nextProvider} from 'react-i18next';
 
 import {createWebsocketActions} from './actions/websocketActions/websocketActions';
 import {Config, type MetropolisConfiguration} from './config';
@@ -19,6 +21,7 @@ import {
   websocket
 } from './stores';
 import {refreshSession} from './utils/api';
+import {initI18n} from './utils/i18n';
 import {MetropolisContext, type MetropolisAdapters} from './utils/MetropolisProvider';
 
 import type {FluxFramework} from '@nlabs/arkhamjs';
@@ -72,11 +75,22 @@ export interface MetropolisProps {
   readonly adapters?: MetropolisAdapters;
   readonly children?: React.ReactElement | React.ReactElement[];
   readonly config?: MetropolisConfiguration;
+  readonly translations?: SimpleTranslations | ComplexTranslations;
 }
 
-export const Metropolis = ({adapters, children, config = {}}: MetropolisProps) => {
+// Translation type definitions
+export type SimpleTranslations = Record<string, string>;
+
+export interface ComplexTranslation {
+  readonly value: string;
+  readonly locale: string;
+  readonly namespace?: string;
+}
+
+export type ComplexTranslations = Record<string, ComplexTranslation>;
+
+export const Metropolis = ({adapters, children, config = {}, translations = {}}: MetropolisProps) => {
   Config.set(config);
-  console.log('Metropolis::init', {config: Config.get()});
   const flux = useFlux();
   const websockets = createWebsocketActions(flux);
   // const [messages, setMessages] = useState<MessageType[]>([]);
@@ -86,6 +100,10 @@ export const Metropolis = ({adapters, children, config = {}}: MetropolisProps) =
   const messages = [];
   const notifications = [];
   const session = {};
+
+  useEffect(() => {
+    initI18n(translations);
+  }, [translations]);
 
   // Save config to app
   // const {isAuth: configAuth} = config;
@@ -178,7 +196,9 @@ export const Metropolis = ({adapters, children, config = {}}: MetropolisProps) =
         updateMessage: () => { },
         updateNotification: () => { }
       }}>
-      {children}
+      <I18nextProvider i18n={i18n}>
+        {children}
+      </I18nextProvider>
     </MetropolisContext.Provider>
   );
 };

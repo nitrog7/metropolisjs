@@ -4,7 +4,17 @@
  */
 import {createContext} from 'react';
 
-import {parseContent, parseEvent, parseImage, parseLocation, parseMessage, parsePost, parseProfile, parseReaction, parseTag, parseUser} from '../adapters';
+import {parseContent} from '../adapters/contentAdapter/contentAdapter';
+import {parseEvent} from '../adapters/eventAdapter/eventAdapter';
+import {parseImage} from '../adapters/imageAdapter/imageAdapter';
+import {parseLocation} from '../adapters/locationAdapter/locationAdapter';
+import {parseMessage} from '../adapters/messageAdapter/messageAdapter';
+import {parsePost} from '../adapters/postAdapter/postAdapter';
+import {parseProfile} from '../adapters/profileAdapter/profileAdapter';
+import {parseReaction} from '../adapters/reactionAdapter/reactionAdapter';
+import {parseTag} from '../adapters/tagAdapter/tagAdapter';
+import {parseTranslation} from '../adapters/translationAdapter/translationAdapter';
+import {parseUser} from '../adapters/userAdapter/userAdapter';
 
 import type {MessageType} from '../adapters';
 import type {SessionType} from './api';
@@ -19,6 +29,7 @@ export interface MetropolisAdapters {
   readonly Profile?: typeof parseProfile;
   readonly Reaction?: typeof parseReaction;
   readonly Tag?: typeof parseTag;
+  readonly Translation?: typeof parseTranslation;
   readonly User?: typeof parseUser;
 }
 

@@ -4,31 +4,29 @@
  */
 import {DateTime} from 'luxon';
 
-import {validatePersonaInput} from '../../adapters/personaAdapter/personaAdapter';
+import {validateProfileInput, type ProfileType} from '../../adapters/profileAdapter/profileAdapter';
 import {validateUserInput} from '../../adapters/userAdapter/userAdapter';
+import {PROFILE_CONSTANTS} from '../../stores';
 import {USER_CONSTANTS} from '../../stores/userStore';
 import {appMutation, publicMutation, refreshSession} from '../../utils/api';
 import {createBaseActions} from '../../utils/baseActionFactory';
 
-import type {FluxAction, FluxFramework} from '@nlabs/arkhamjs';
-import type {PersonaType} from '../../adapters/personaAdapter/personaAdapter';
 import type {User} from '../../adapters/userAdapter/userAdapter';
 import type {ApiResultsType, ReaktorDbCollection, SessionType} from '../../utils/api';
 import type {BaseAdapterOptions} from '../../utils/validatorFactory';
+import type {FluxAction, FluxFramework} from '@nlabs/arkhamjs';
 
 const DATA_TYPE: ReaktorDbCollection = 'users';
 
-export interface UserAdapterOptions extends BaseAdapterOptions {
-}
+export type UserAdapterOptions = BaseAdapterOptions;
 
-export interface PersonaAdapterOptions extends BaseAdapterOptions {
-}
+export type UserProfileAdapterOptions = BaseAdapterOptions;
 
 export interface UserActionsOptions {
   readonly userAdapter?: (input: unknown, options?: UserAdapterOptions) => any;
-  readonly personaAdapter?: (input: unknown, options?: PersonaAdapterOptions) => any;
+  readonly profileAdapter?: (input: unknown, options?: UserProfileAdapterOptions) => any;
   readonly userAdapterOptions?: UserAdapterOptions;
-  readonly personaAdapterOptions?: PersonaAdapterOptions;
+  readonly profileAdapterOptions?: UserProfileAdapterOptions;
 }
 
 export interface UserApiResultsType {
@@ -55,7 +53,7 @@ export interface UserApiResultsType {
     readonly signUp?: Partial<User>;
     readonly update?: Partial<User>;
     readonly updatePassword?: Partial<boolean>;
-    readonly updatePersona?: Partial<PersonaType>;
+    readonly updateProfile?: Partial<ProfileType>;
   };
 }
 
@@ -69,7 +67,7 @@ const defaultUserValidator = (input: unknown, options?: UserAdapterOptions) => {
   return validated;
 };
 
-const defaultPersonaValidator = (input: unknown, options?: PersonaAdapterOptions) => validatePersonaInput(input);
+const defaultProfileValidator = (input: unknown, options?: UserProfileAdapterOptions) => validateProfileInput(input);
 
 export interface userActions {
   add: (userInput: Partial<User>, userProps?: string[]) => Promise<User>;
@@ -79,8 +77,20 @@ export interface userActions {
   itemById: (userId: string, userProps?: string[]) => Promise<User>;
   listByLatest: (username?: string, from?: number, to?: number, userProps?: string[]) => Promise<User[]>;
   listByConnection: (userId: string, from?: number, to?: number, userProps?: string[]) => Promise<User[]>;
-  listByReactions: (username: string, reactionNames: string[], from?: number, to?: number, profileProps?: string[]) => Promise<User[]>;
-  listByTags: (username: string, tagNames: string[], from?: number, to?: number, profileProps?: string[]) => Promise<User[]>;
+  listByReactions: (
+    username: string,
+    reactionNames: string[],
+    from?: number,
+    to?: number,
+    profileProps?: string[]
+  ) => Promise<User[]>;
+  listByTags: (
+    username: string,
+    tagNames: string[],
+    from?: number,
+    to?: number,
+    profileProps?: string[]
+  ) => Promise<User[]>;
   isLoggedIn: () => boolean;
   refreshSession: (token?: string, expires?: number) => Promise<SessionType>;
   signIn: (username: string, password: string, expires?: number) => Promise<SessionType>;
@@ -90,12 +100,12 @@ export interface userActions {
   resetPassword: (username: string, password: string, code: string, type: 'email' | 'phone') => Promise<boolean>;
   updatePassword: (password: string, newPassword: string) => Promise<boolean>;
   updateUser: (userInput: Partial<User>, userProps?: string[]) => Promise<User>;
-  updatePersona: (personaInput: Partial<PersonaType>) => Promise<PersonaType>;
+  updateProfile: (profileInput: Partial<ProfileType>) => Promise<ProfileType>;
   signUp: (userInput: Partial<User>, userProps?: string[]) => Promise<User>;
   updateUserAdapter: (adapter: (input: unknown, options?: UserAdapterOptions) => any) => void;
-  updatePersonaAdapter: (adapter: (input: unknown, options?: PersonaAdapterOptions) => any) => void;
+  updateProfileAdapter: (adapter: (input: unknown, options?: UserProfileAdapterOptions) => any) => void;
   updateUserAdapterOptions: (options: UserAdapterOptions) => void;
-  updatePersonaAdapterOptions: (options: PersonaAdapterOptions) => void;
+  updateProfileAdapterOptions: (options: UserProfileAdapterOptions) => void;
 }
 
 export const createUserActions = (
@@ -107,9 +117,9 @@ export const createUserActions = (
     adapterOptions: options?.userAdapterOptions
   });
 
-  const personaBase = createBaseActions(flux, defaultPersonaValidator, {
-    adapter: options?.personaAdapter,
-    adapterOptions: options?.personaAdapterOptions
+  const profileBase = createBaseActions(flux, defaultProfileValidator, {
+    adapter: options?.profileAdapter,
+    adapterOptions: options?.profileAdapterOptions
   });
   const add = async (userInput: Partial<User>, userProps: string[] = []): Promise<User> => {
     const queryVariables = {
@@ -122,8 +132,8 @@ export const createUserActions = (
     const onSuccess = (data: UserApiResultsType): Promise<FluxAction> => {
       const {users: {add = {}}} = data;
       return flux.dispatch({
-        user: add,
-        type: USER_CONSTANTS.ADD_ITEM_SUCCESS
+        type: USER_CONSTANTS.ADD_ITEM_SUCCESS,
+        user: add
       });
     };
 
@@ -154,7 +164,7 @@ export const createUserActions = (
       {onSuccess}
     );
 
-    flux.dispatch({user, type: USER_CONSTANTS.ADD_ITEM_SUCCESS});
+    flux.dispatch({type: USER_CONSTANTS.ADD_ITEM_SUCCESS, user});
     return user as User;
   };
 
@@ -169,8 +179,8 @@ export const createUserActions = (
     const onSuccess = (data: UserApiResultsType): Promise<FluxAction> => {
       const {users: {signUp = {}}} = data;
       return flux.dispatch({
-        user: signUp,
-        type: USER_CONSTANTS.SIGN_UP_SUCCESS
+        type: USER_CONSTANTS.SIGN_UP_SUCCESS,
+        user: signUp
       });
     };
 
@@ -223,8 +233,8 @@ export const createUserActions = (
     const onSuccess = (data: ApiResultsType = {}) => {
       const {users: {update = {}}} = data as unknown as UserApiResultsType;
       return flux.dispatch({
-        user: update,
-        type: USER_CONSTANTS.UPDATE_ITEM_SUCCESS
+        type: USER_CONSTANTS.UPDATE_ITEM_SUCCESS,
+        user: update
       });
     };
 
@@ -259,21 +269,21 @@ export const createUserActions = (
     return user as User;
   };
 
-  const updatePersona = async (personaInput: Partial<PersonaType>): Promise<PersonaType> => {
+  const updateProfile = async (profileInput: Partial<ProfileType>): Promise<ProfileType> => {
     const queryVariables = {
-      persona: {
-        type: 'PersonaUpdateInput!',
-        value: personaBase.validator(personaInput)
+      profile: {
+        type: 'ProfileUpdateInput!',
+        value: profileBase.validator(profileInput)
       }
     };
 
     const onSuccess = (data: ApiResultsType = {}) => {
-      const {users: {updatePersona = {}}} = data as unknown as UserApiResultsType;
-      return flux.dispatch({persona: updatePersona, type: USER_CONSTANTS.UPDATE_PERSONA_SUCCESS});
+      const {users: {updateProfile = {}}} = data as unknown as UserApiResultsType;
+      return flux.dispatch({profile: updateProfile, type: PROFILE_CONSTANTS.UPDATE_ITEM_SUCCESS});
     };
 
-    const {persona} = await appMutation(flux, 'updatePersona', DATA_TYPE, queryVariables, [], {onSuccess});
-    return persona as PersonaType;
+    const {profile} = await appMutation(flux, 'updateProfile', DATA_TYPE, queryVariables, [], {onSuccess});
+    return profile as ProfileType;
   };
 
 
@@ -281,17 +291,56 @@ export const createUserActions = (
     true
   ;
 
-  const remove = async (userId: string): Promise<User> =>
-    ({} as User)
-  ;
+  const remove = async (userId: string): Promise<User> => {
+    const queryVariables = {
+      userId: {
+        type: 'String!',
+        value: userId
+      }
+    };
 
-  const session = async (userProps: string[] = []): Promise<User> =>
-    ({} as User)
-  ;
+    const onSuccess = (data: ApiResultsType = {}) => {
+      const {users: {remove = {}}} = data as unknown as UserApiResultsType;
+      return flux.dispatch({type: USER_CONSTANTS.REMOVE_ITEM_SUCCESS, user: remove});
+    };
 
-  const itemById = async (userId: string, userProps: string[] = []): Promise<User> =>
-    ({} as User)
-  ;
+    const {user} = await appMutation(flux, 'remove', DATA_TYPE, queryVariables, [], {onSuccess});
+    return user as User;
+  };
+
+  const session = async (userInput: string[] = []): Promise<User> => {
+    const queryVariables = {
+      user: {
+        type: 'UserInput!',
+        value: userBase.validator(userInput)
+      }
+    };
+
+    const onSuccess = (data: ApiResultsType = {}) => {
+      const {users: {session = {}}} = data as unknown as UserApiResultsType;
+      return flux.dispatch({type: USER_CONSTANTS.GET_SESSION_SUCCESS, user: session});
+    };
+
+    const {user} = await appMutation(flux, 'session', DATA_TYPE, queryVariables, [], {onSuccess});
+    return user as User;
+  };
+
+  const itemById = async (userId: string, userProps: string[] = []): Promise<User> => {
+    const queryVariables = {
+      userId: {
+        type: 'String!',
+        value: userId
+      }
+    };
+
+    const onSuccess = (data: ApiResultsType = {}) => {
+      const {users: {itemById = {}}} = data as unknown as UserApiResultsType;
+      return flux.dispatch({type: USER_CONSTANTS.GET_ITEM_SUCCESS, user: itemById});
+    };
+
+    const {user} = await appMutation(flux, 'itemById', DATA_TYPE, queryVariables, [], {onSuccess});
+    return user as User;
+  };
 
   const listByLatest = async (
     username: string = '',
@@ -420,27 +469,27 @@ export const createUserActions = (
   return {
     add,
     confirmCode,
-    remove,
-    session,
-    itemById,
-    listByLatest,
-    listByConnection,
-    listByReactions,
-    listByTags,
-    isLoggedIn,
-    refreshSession: refreshSessionAction,
-    signIn,
-    signOut,
     confirmSignUp,
     forgotPassword,
+    isLoggedIn,
+    itemById,
+    listByConnection,
+    listByLatest,
+    listByReactions,
+    listByTags,
+    refreshSession: refreshSessionAction,
+    remove,
     resetPassword,
-    updatePassword,
-    updateUser,
-    updatePersona,
+    session,
+    signIn,
+    signOut,
     signUp,
+    updatePassword,
+    updateProfile,
+    updateProfileAdapter: profileBase.updateAdapter,
+    updateProfileAdapterOptions: profileBase.updateOptions,
+    updateUser,
     updateUserAdapter: userBase.updateAdapter,
-    updatePersonaAdapter: personaBase.updateAdapter,
-    updateUserAdapterOptions: userBase.updateOptions,
-    updatePersonaAdapterOptions: personaBase.updateOptions
+    updateUserAdapterOptions: userBase.updateOptions
   };
 };

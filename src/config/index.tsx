@@ -56,7 +56,7 @@ export class Config {
           }
         },
         environment: 'development',
-        isAuth: () => false
+        isAuth: () => true
       },
       local: {
         app: {
@@ -66,7 +66,7 @@ export class Config {
           }
         },
         environment: 'local',
-        isAuth: () => false
+        isAuth: () => true
       },
       production: {
         app: {
@@ -76,7 +76,7 @@ export class Config {
           }
         },
         environment: 'production',
-        isAuth: () => false
+        isAuth: () => true
       },
       test: {
         app: {
@@ -86,7 +86,7 @@ export class Config {
           }
         },
         environment: 'test',
-        isAuth: () => false
+        isAuth: () => true
       }
     };
   }
@@ -113,7 +113,6 @@ export class Config {
     const baseConfig: MetropolisConfiguration = this.updatedConfig || this.values();
     const environment: string = process.env.stage || process.env.NODE_ENV || 'local';
 
-    console.log({environment});
     if(this.updatedConfig) {
       const overrideEnvironmentConfig = this.updatedConfig[environment] || {};
       const config = merge({}, baseConfig, overrideEnvironmentConfig);

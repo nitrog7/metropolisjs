@@ -8,6 +8,7 @@ export * from './profileActions/profileActions';
 export * from './reactionActions/reactionActions';
 export * from './sseActions/sseActions';
 export * from './tagActions/tagActions';
+export * from './translationActions/translationActions';
 export * from './userActions/userActions';
 export * from './websocketActions/websocketActions';
 

@@ -12,6 +12,7 @@ import {createProfileActions} from '../actions/profileActions/profileActions';
 import {createReactionActions} from '../actions/reactionActions/reactionActions';
 import {createSSEActions} from '../actions/sseActions/sseActions';
 import {createTagActions} from '../actions/tagActions/tagActions';
+import {createTranslationActions} from '../actions/translationActions/translationActions';
 import {createUserActions} from '../actions/userActions/userActions';
 import {createWebsocketActions} from '../actions/websocketActions/websocketActions';
 
@@ -26,6 +27,7 @@ import type {ProfileActionsOptions} from '../actions/profileActions/profileActio
 import type {ReactionActionsOptions} from '../actions/reactionActions/reactionActions';
 import type {SSEActionsOptions} from '../actions/sseActions/sseActions';
 import type {TagActionsOptions} from '../actions/tagActions/tagActions';
+import type {TranslationActionsOptions} from '../actions/translationActions/translationActions';
 import type {UserActionsOptions} from '../actions/userActions/userActions';
 
 export type ActionType =
@@ -39,6 +41,7 @@ export type ActionType =
   | 'reaction'
   | 'sse'
   | 'tag'
+  | 'translation'
   | 'user'
   | 'websocket';
 
@@ -53,6 +56,7 @@ export type ActionOptions =
   | ReactionActionsOptions
   | SSEActionsOptions
   | TagActionsOptions
+  | TranslationActionsOptions
   | UserActionsOptions
   | undefined;
 
@@ -91,6 +95,9 @@ export const createAction = <T extends ActionType>(
 
     case 'tag':
       return createTagActions(flux, options as TagActionsOptions);
+
+    case 'translation':
+      return createTranslationActions(flux, options as TranslationActionsOptions);
 
     case 'user':
       return createUserActions(flux, options as UserActionsOptions);
@@ -132,6 +139,7 @@ export const createAllActions = (
     'reaction',
     'sse',
     'tag',
+    'translation',
     'user',
     'websocket'
   ];
