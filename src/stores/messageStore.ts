@@ -42,11 +42,7 @@ export const messageStore = (type: string, data: {
       const {conversations} = state;
       return {...state, conversations: {...conversations, [conversationId]: list || []}};
     }
-    // case MESSAGE_GET_LIST_SUCCESS: {
-    //   const {list, conversationId} = data;
-    //   const {conversations} = state;
-    //   return {...state, conversations: {...conversations, [conversationId]: list}};
-    // }
+
     default: {
       return state;
     }

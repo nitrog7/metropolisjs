@@ -19,11 +19,9 @@ import type {BaseAdapterOptions} from '../../utils/validatorFactory';
 const DATA_TYPE: ReaktorDbCollection = 'users';
 
 export interface UserAdapterOptions extends BaseAdapterOptions {
-  // User-specific options can be added here
 }
 
 export interface PersonaAdapterOptions extends BaseAdapterOptions {
-  // Persona-specific options can be added here
 }
 
 export interface UserActionsOptions {
@@ -61,7 +59,6 @@ export interface UserApiResultsType {
   };
 }
 
-// Default validation functions
 const defaultUserValidator = (input: unknown, options?: UserAdapterOptions) => {
   const validated = validateUserInput(input);
 
@@ -101,85 +98,19 @@ export interface userActions {
   updatePersonaAdapterOptions: (options: PersonaAdapterOptions) => void;
 }
 
-/**
- * Factory function to create userActions with enhanced adapter injection capabilities.
- * Custom adapters are merged with default behavior, allowing partial overrides.
- *
- * @example
- * // Basic usage with default adapters
- * const userActions = createUserActions(flux);
- *
- * @example
- * // Custom adapter that extends default behavior
- * const customUserAdapter = (input: unknown, options?: UserAdapterOptions) => {
- *   // input is already validated by default adapter
- *   if (input.email && !input.email.includes('@company.com')) {
- *     throw new Error('Only company emails allowed');
- *   }
- *   return input;
- * };
- *
- * const userActions = createUserActions(flux, {
- *   userAdapter: customUserAdapter
- * });
- *
- * @example
- * // Configuration-based adapters
- * const userActions = createUserActions(flux, {
- *   userAdapterOptions: {
- *     strict: true,
- *     environment: 'production'
- *   }
- * });
- *
- * @example
- * // Runtime adapter updates
- * userActions.updateUserAdapter(customUserAdapter);
- *
- * @example
- * // Complex adapter with business logic
- * const businessUserAdapter = (input: unknown, options?: UserAdapterOptions) => {
- *   // input is already validated by default adapter
- *   const user = input as any;
- *
- *   // Add business-specific validation
- *   if (user.userAccess > 5) {
- *     throw new Error('User access level too high');
- *   }
- *
- *   // Add computed fields
- *   return {
- *     ...user,
- *     fullName: `${user.first || ''} ${user.last || ''}`.trim(),
- *     isAdmin: user.userAccess >= 3
- *   };
- * };
- *
- * const userActions = createUserActions(flux, {
- *   userAdapter: businessUserAdapter,
- *   userAdapterOptions: {
- *     strict: true,
- *     environment: 'production'
- *   }
- * });
- */
 export const createUserActions = (
   flux: FluxFramework,
   options?: UserActionsOptions
 ): userActions => {
-  // Create base actions for user validation
   const userBase = createBaseActions(flux, defaultUserValidator, {
     adapter: options?.userAdapter,
     adapterOptions: options?.userAdapterOptions
   });
 
-  // Create base actions for persona validation
   const personaBase = createBaseActions(flux, defaultPersonaValidator, {
     adapter: options?.personaAdapter,
     adapterOptions: options?.personaAdapterOptions
   });
-
-  // Action implementations using the base utilities
   const add = async (userInput: Partial<User>, userProps: string[] = []): Promise<User> => {
     const queryVariables = {
       user: {
@@ -243,37 +174,42 @@ export const createUserActions = (
       });
     };
 
-    const {users: {signUp: user = {}}} = await publicMutation<UserApiResultsType>(
-      flux,
-      'signUp',
-      DATA_TYPE,
-      queryVariables,
-      [
-        'added',
-        'city',
-        'country',
-        'dob',
-        'firstName',
-        'gender',
-        'imageCount',
-        'imageUrl',
-        'latitude',
-        'lastName',
-        'longitude',
-        'mailingList',
-        'modified',
-        'name',
-        'state',
-        'tags {id, name, tagId}',
-        'thumbUrl',
-        'userAccess',
-        'userId',
-        'username',
-        ...userProps
-      ],
-      {onSuccess}
-    );
-    return user as User;
+    try {
+      const {users: {signUp: user = {}}} = await publicMutation<UserApiResultsType>(
+        flux,
+        'signUp',
+        DATA_TYPE,
+        queryVariables,
+        [
+          'added',
+          'city',
+          'country',
+          'dob',
+          'firstName',
+          'gender',
+          'imageCount',
+          'imageUrl',
+          'latitude',
+          'lastName',
+          'longitude',
+          'mailingList',
+          'modified',
+          'name',
+          'state',
+          'tags {id, name, tagId}',
+          'thumbUrl',
+          'userAccess',
+          'userId',
+          'username',
+          ...userProps
+        ],
+        {onSuccess}
+      );
+      return user as User;
+    } catch(error) {
+      flux.dispatch({error, type: USER_CONSTANTS.SIGN_UP_ERROR});
+      throw error;
+    }
   };
 
   const updateUser = async (userInput: Partial<User>, userProps: string[] = []): Promise<User> => {
@@ -340,24 +276,20 @@ export const createUserActions = (
     return persona as PersonaType;
   };
 
-  // Placeholder implementations for other methods (you can add the full implementations)
+
   const confirmCode = async (type: 'email' | 'phone', code: number): Promise<boolean> =>
-    // Implementation here
     true
   ;
 
   const remove = async (userId: string): Promise<User> =>
-    // Implementation here
     ({} as User)
   ;
 
   const session = async (userProps: string[] = []): Promise<User> =>
-    // Implementation here
     ({} as User)
   ;
 
   const itemById = async (userId: string, userProps: string[] = []): Promise<User> =>
-    // Implementation here
     ({} as User)
   ;
 
@@ -367,7 +299,6 @@ export const createUserActions = (
     to: number = 10,
     userProps: string[] = []
   ): Promise<User[]> =>
-    // Implementation here
     []
   ;
 
@@ -377,7 +308,6 @@ export const createUserActions = (
     to: number = 10,
     userProps: string[] = []
   ): Promise<User[]> =>
-    // Implementation here
     []
   ;
 
@@ -388,7 +318,6 @@ export const createUserActions = (
     to: number = 10,
     profileProps: string[] = []
   ): Promise<User[]> =>
-    // Implementation here
     []
   ;
 
@@ -399,7 +328,6 @@ export const createUserActions = (
     to: number = 10,
     profileProps: string[] = []
   ): Promise<User[]> =>
-    // Implementation here
     []
   ;
 
@@ -438,7 +366,6 @@ export const createUserActions = (
     };
 
     const onSuccess = (data: ApiResultsType = {}): Promise<FluxAction> => {
-      // Robustly extract users from the response
       const users = (data as any)?.users;
       const sessionData = users?.signIn || {};
       return flux.dispatch({
@@ -448,7 +375,6 @@ export const createUserActions = (
     };
 
     try {
-      // publicMutation returns the result of onSuccess callback, which is a FluxAction
       await publicMutation<UserApiResultsType>(
         flux,
         'signIn',
@@ -458,7 +384,6 @@ export const createUserActions = (
         {onSuccess}
       );
 
-      // Return the session data from the flux state since onSuccess already processed it
       const sessionData = flux.getState('user.session') || {};
       return sessionData as SessionType;
     } catch(error) {
@@ -468,17 +393,14 @@ export const createUserActions = (
   };
 
   const signOut = async (): Promise<boolean> =>
-    // Implementation here
     true
   ;
 
   const confirmSignUp = async (code: string, type: 'email' | 'phone'): Promise<boolean> =>
-    // Implementation here
     true
   ;
 
   const forgotPassword = async (username: string): Promise<boolean> =>
-    // Implementation here
     true
   ;
 
@@ -488,16 +410,13 @@ export const createUserActions = (
     code: string,
     type: 'email' | 'phone'
   ): Promise<boolean> =>
-    // Implementation here
     true
   ;
 
   const updatePassword = async (password: string, newPassword: string): Promise<boolean> =>
-    // Implementation here
     true
   ;
 
-  // Return the actions object with update functions from base actions
   return {
     add,
     confirmCode,

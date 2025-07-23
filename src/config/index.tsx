@@ -30,6 +30,13 @@ export interface ConfigAppType {
 }
 
 export interface MetropolisConfiguration {
+  readonly local?: MetropolisEnvironmentConfiguration;
+  readonly development?: MetropolisEnvironmentConfiguration;
+  readonly production?: MetropolisEnvironmentConfiguration;
+  readonly test?: MetropolisEnvironmentConfiguration;
+}
+
+export interface MetropolisEnvironmentConfiguration {
   readonly adapters?: MetropolisAdapters;
   readonly app?: Partial<ConfigAppType>;
   readonly environment?: string;
@@ -37,21 +44,86 @@ export interface MetropolisConfiguration {
 }
 
 export class Config {
-  static values: Record<string, unknown> = {};
+  private static updatedConfig = {};
 
-  static setConfig(values: MetropolisConfiguration): MetropolisConfiguration {
-    this.values = merge(this.values, values);
-    return this.values;
+  static values(): MetropolisConfiguration {
+    return {
+      development: {
+        app: {
+          api: {
+            public: 'http://localhost:3000/public',
+            url: 'http://localhost:3000/app'
+          }
+        },
+        environment: 'development',
+        isAuth: () => false
+      },
+      local: {
+        app: {
+          api: {
+            public: 'https://dev-api.torch.one/public',
+            url: 'https://dev-api.torch.one/app'
+          }
+        },
+        environment: 'local',
+        isAuth: () => false
+      },
+      production: {
+        app: {
+          api: {
+            public: 'https://api.torch.one/public',
+            url: 'https://api.torch.one/app'
+          }
+        },
+        environment: 'production',
+        isAuth: () => false
+      },
+      test: {
+        app: {
+          api: {
+            public: 'http://localhost:3000/public',
+            url: 'http://localhost:3000/app'
+          }
+        },
+        environment: 'test',
+        isAuth: () => false
+      }
+    };
   }
 
-  static get<T = unknown>(path?: string | string[], defaultValue?: T): T {
-    const environment: string = process.env.NODE_ENV || 'development';
-    const configValues: MetropolisConfiguration = {...this.values, environment};
+  static set(override: object, environment?: string): object {
+    const currentConfig = this.get();
+    const targetEnvironment = environment || process.env.stage || process.env.NODE_ENV || 'local';
 
-    if(!path) {
-      return configValues as T;
+    if(override[targetEnvironment]) {
+      this.updatedConfig = merge({}, currentConfig, override[targetEnvironment]);
+    } else {
+      this.updatedConfig = merge({}, currentConfig, override);
     }
 
-    return get(configValues, path, defaultValue) as T;
+    return {...this.updatedConfig};
+  }
+
+  static reset(): void {
+    this.updatedConfig = {};
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  static get<T = any>(path?: string | string[], defaultValue?: T): T {
+    const baseConfig: MetropolisConfiguration = this.updatedConfig || this.values();
+    const environment: string = process.env.stage || process.env.NODE_ENV || 'local';
+
+    console.log({environment});
+    if(this.updatedConfig) {
+      const overrideEnvironmentConfig = this.updatedConfig[environment] || {};
+      const config = merge({}, baseConfig, overrideEnvironmentConfig);
+
+      return path ? get(config, path, defaultValue) : config;
+    }
+
+    const localConfig = baseConfig?.local || {};
+    const config = merge({}, localConfig, baseConfig[environment] || {});
+
+    return path ? get(config, path, defaultValue) : config;
   }
 }

@@ -33,15 +33,12 @@ export const createValidatorFactory = <T extends BaseAdapterOptions>(
 ) => (input: unknown, validatorOptions?: T) => {
   const mergedOptions = {...options, ...validatorOptions};
 
-  // Start with default validation
   let validated = defaultValidator(input, mergedOptions as T);
 
-  // Apply custom validation if provided
   if(customAdapter) {
     validated = customAdapter(validated, mergedOptions as T);
   }
 
-  // Apply custom validation from options if provided
   if(mergedOptions?.customValidation) {
     validated = mergedOptions.customValidation(validated);
   }

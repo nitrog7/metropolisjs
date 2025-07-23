@@ -23,6 +23,8 @@ import {MetropolisContext, type MetropolisAdapters} from './utils/MetropolisProv
 
 import type {FluxFramework} from '@nlabs/arkhamjs';
 
+export {MetropolisContext, MetropolisProvider} from './utils/MetropolisProvider';
+
 export type {MetropolisConfiguration} from './config';
 export type {MetropolisAdapters} from './utils/MetropolisProvider';
 
@@ -64,6 +66,8 @@ export {
   type ReaktorDbCollection
 } from './utils/api';
 
+export {Config} from './config';
+
 export interface MetropolisProps {
   readonly adapters?: MetropolisAdapters;
   readonly children?: React.ReactElement | React.ReactElement[];
@@ -71,8 +75,8 @@ export interface MetropolisProps {
 }
 
 export const Metropolis = ({adapters, children, config = {}}: MetropolisProps) => {
-  Config.setConfig(config);
-  console.log('Metropolis::init', {config});
+  Config.set(config);
+  console.log('Metropolis::init', {config: Config.get()});
   const flux = useFlux();
   const websockets = createWebsocketActions(flux);
   // const [messages, setMessages] = useState<MessageType[]>([]);

@@ -23,17 +23,7 @@ export interface WebsocketActions {
   wsInit: (token?: string) => Sockette | null;
 }
 
-/**
- * Factory function to create WebsocketActions.
- *
- * @example
- * // Basic usage
- * const websocketActions = createWebsocketActions(flux);
- *
- * @example
- * // Initialize websocket connection
- * const ws = websocketActions.wsInit(token);
- */
+
 export const createWebsocketActions = (flux: FluxFramework): WebsocketActions => {
   let ws: Sockette;
 
@@ -94,7 +84,6 @@ export const createWebsocketActions = (flux: FluxFramework): WebsocketActions =>
     return null;
   };
 
-  // Return the actions object
   return {
     wsSend,
     onReceive,

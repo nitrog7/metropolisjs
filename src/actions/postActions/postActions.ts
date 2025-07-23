@@ -17,7 +17,6 @@ import type {BaseAdapterOptions} from '../../utils/validatorFactory';
 const DATA_TYPE: ReaktorDbCollection = 'posts';
 
 export interface PostAdapterOptions extends BaseAdapterOptions {
-  // Post-specific options can be added here
 }
 
 export interface PostActionsOptions {
@@ -51,42 +50,16 @@ export interface PostActions {
   updatePostAdapterOptions: (options: PostAdapterOptions) => void;
 }
 
-// Default validation function
 const defaultPostValidator = (input: unknown, options?: PostAdapterOptions) => validatePostInput(input);
 
-/**
- * Factory function to create PostActions with enhanced adapter injection capabilities.
- * Custom adapters are merged with default behavior, allowing partial overrides.
- *
- * @example
- * // Basic usage with default adapters
- * const postActions = createPostActions(flux);
- *
- * @example
- * // Custom adapter that extends default behavior
- * const customPostAdapter = (input: unknown, options?: PostAdapterOptions) => {
- *   // input is already validated by default adapter
- *   if (input.content && input.content.length > 1000) {
- *     throw new Error('Post content too long');
- *   }
- *   return input;
- * };
- *
- * const postActions = createPostActions(flux, {
- *   postAdapter: customPostAdapter
- * });
- */
 export const createPostActions = (
   flux: FluxFramework,
   options?: PostActionsOptions
 ): PostActions => {
-  // Create base actions for post validation
   const postBase = createBaseActions(flux, defaultPostValidator, {
     adapter: options?.postAdapter,
     adapterOptions: options?.postAdapterOptions
   });
-
-  // Action implementations
   const add = async (postData: Partial<PostType>, postProps: string[] = []): Promise<PostType> => {
     try {
       const queryVariables = {
@@ -437,7 +410,6 @@ export const createPostActions = (
     }
   };
 
-  // Return the actions object
   return {
     add,
     itemById,

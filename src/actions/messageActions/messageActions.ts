@@ -3,14 +3,14 @@
  * Copyrights licensed under the MIT License. See the accompanying LICENSE file for terms.
  */
 
-import {validateMessageInput} from '../../adapters/messageAdapter/messageAdapter';
-import {MESSAGE_CONSTANTS} from '../../stores/messageStore';
-import {appMutation, appQuery} from '../../utils/api';
+import { validateMessageInput } from '../../adapters/messageAdapter/messageAdapter';
+import { MESSAGE_CONSTANTS } from '../../stores/messageStore';
+import { appMutation, appQuery } from '../../utils/api';
 
-import type {FluxFramework} from '@nlabs/arkhamjs';
-import type {ConversationType} from '../../adapters/conversationAdapter/conversationAdapter';
-import type {MessageType} from '../../adapters/messageAdapter/messageAdapter';
-import type {ApiResultsType, ReaktorDbCollection} from '../../utils/api';
+import type { FluxFramework } from '@nlabs/arkhamjs';
+import type { ConversationType } from '../../adapters/conversationAdapter/conversationAdapter';
+import type { MessageType } from '../../adapters/messageAdapter/messageAdapter';
+import type { ApiResultsType, ReaktorDbCollection } from '../../utils/api';
 
 const DATA_TYPE: ReaktorDbCollection = 'messages';
 
@@ -42,25 +42,20 @@ export interface MessageActions {
   updateMessageAdapterOptions: (options: MessageAdapterOptions) => void;
 }
 
-// Default validation function
 const defaultMessageValidator = (input: unknown, options?: MessageAdapterOptions) => validateMessageInput(input);
 
-// Enhanced validation function that merges custom logic with defaults
 const createMessageValidator = (
   customAdapter?: (input: unknown, options?: MessageAdapterOptions) => any,
   options?: MessageAdapterOptions
 ) => (input: unknown, validatorOptions?: MessageAdapterOptions) => {
   const mergedOptions = {...options, ...validatorOptions};
 
-  // Start with default validation
   let validated = defaultMessageValidator(input, mergedOptions);
 
-  // Apply custom validation if provided
   if(customAdapter) {
     validated = customAdapter(validated, mergedOptions);
   }
 
-  // Apply custom validation from options if provided
   if(mergedOptions?.customValidation) {
     validated = mergedOptions.customValidation(validated) as MessageType;
   }
@@ -68,40 +63,15 @@ const createMessageValidator = (
   return validated;
 };
 
-/**
- * Factory function to create MessageActions with enhanced adapter injection capabilities.
- * Custom adapters are merged with default behavior, allowing partial overrides.
- *
- * @example
- * // Basic usage with default adapters
- * const messageActions = createMessageActions(flux);
- *
- * @example
- * // Custom adapter that extends default behavior
- * const customMessageAdapter = (input: unknown, options?: MessageAdapterOptions) => {
- *   // input is already validated by default adapter
- *   if (input.content && input.content.length > 1000) {
- *     throw new Error('Message content too long');
- *   }
- *   return input;
- * };
- *
- * const messageActions = createMessageActions(flux, {
- *   messageAdapter: customMessageAdapter
- * });
- */
 export const createMessageActions = (
   flux: FluxFramework,
   options?: MessageActionsOptions
 ): MessageActions => {
-  // Initialize adapter state
   let messageAdapterOptions: MessageAdapterOptions = options?.messageAdapterOptions || {};
   let customMessageAdapter = options?.messageAdapter;
 
-  // Create validators that merge custom adapters with defaults
   let validateMessage = createMessageValidator(customMessageAdapter, messageAdapterOptions);
 
-  // Update functions that recreate validators
   const updateMessageAdapter = (adapter: (input: unknown, options?: MessageAdapterOptions) => any): void => {
     customMessageAdapter = adapter;
     validateMessage = createMessageValidator(customMessageAdapter, messageAdapterOptions);
@@ -111,8 +81,6 @@ export const createMessageActions = (
     messageAdapterOptions = {...messageAdapterOptions, ...options};
     validateMessage = createMessageValidator(customMessageAdapter, messageAdapterOptions);
   };
-
-  // Action implementations
   const sendMessage = async (message: Partial<MessageType>, messageProps: string[] = []): Promise<MessageType> => {
     try {
       const queryVariables = {
@@ -124,7 +92,6 @@ export const createMessageActions = (
 
       const onSuccess = (data: ApiResultsType = {}) => {
         const {sendMessage: message = {}} = data;
-        //const sessionId: string = flux.getState('user.session.userId', '');
         return flux.dispatch({message, type: MESSAGE_CONSTANTS.ADD_ITEM_SUCCESS});
       };
 
@@ -183,7 +150,6 @@ export const createMessageActions = (
 
       const onSuccess = (data: ApiResultsType = {}) => {
         const {messages = []} = data as {messages: MessageType[]};
-        //const sessionId: string = flux.getState('user.session.userId', '');
 
         return flux.dispatch({
           conversationId,
@@ -240,7 +206,6 @@ export const createMessageActions = (
     }
   };
 
-  // Return the actions object
   return {
     sendMessage,
     getDirectConversation,

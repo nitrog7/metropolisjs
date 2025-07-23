@@ -4,7 +4,6 @@ export const convertFileToBase64 = (file: File, maxSize: number): Promise<string
     reader.onload = () => {
       const image = new Image();
       image.onload = () => {
-        // Resize the image
         const canvas: HTMLCanvasElement = document.createElement('canvas');
         const {height, width} = image;
         let updatedHeight: number = height;
@@ -24,23 +23,13 @@ export const convertFileToBase64 = (file: File, maxSize: number): Promise<string
         canvas.height = updatedHeight;
         canvas.getContext('2d')?.drawImage(image, 0, 0, updatedWidth, updatedHeight);
         const dataUrl: string = canvas.toDataURL('image/jpeg');
-        // const resizedImage = dataURLToBlob(dataUrl);
 
         resolve(dataUrl);
-        // $.event.trigger({
-        //   type: 'imageResized',
-        //   blob: resizedImage,
-        //   url: dataUrl
-        // });
       };
 
       const originalBase64: string = reader.result as string;
       image.src = originalBase64;
     };
-    // reader.onloadend = () => {
-    //   const base64: string = reader.result as string;
-    //   resolve(base64);
-    // };
     reader.onerror = (event: ProgressEvent) => {
       reject(event);
     };

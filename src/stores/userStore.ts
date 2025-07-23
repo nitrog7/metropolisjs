@@ -56,6 +56,7 @@ export const USER_CONSTANTS = {
 export type UserConstantsType = typeof USER_CONSTANTS[keyof typeof USER_CONSTANTS];
 
 interface UserState {
+  error?: Error;
   likes: string[];
   lists: Record<string, unknown>;
   session: Partial<User>;
@@ -75,6 +76,7 @@ export const countFieldMap = {
 };
 
 interface UserData {
+  readonly error?: Error;
   readonly itemId?: string;
   readonly itemType?: string;
   readonly list?: User[];
@@ -171,10 +173,23 @@ export const userStore = (type: string, data: UserData, state = defaultValues): 
       const {username} = state.session;
       return {...state, session: {username: username || ''}};
     }
+    case USER_CONSTANTS.SIGN_UP_ERROR: {
+      const {error} = data;
+      return {...state, error};
+    }
     case USER_CONSTANTS.SIGN_IN_SUCCESS: {
       const {session} = data;
       if(session) {
         return {...state, lists: {}, session, users: {}};
+      }
+      return state;
+    }
+    case USER_CONSTANTS.SIGN_UP_SUCCESS: {
+      const {user} = data;
+      if(user && user.userId) {
+        const {users} = state;
+        users[user.userId] = {...user.toJson(), timestamp: Date.now()};
+        return {...state, error: undefined, users};
       }
       return state;
     }

@@ -49,7 +49,6 @@ export const autoCompleteLocation = pDebounce(async (
     ]) as {autoCompleteLocation: Record<string, unknown>[]};
     return autoCompleteLocation.map((item) => CustomClass(item));
   } catch(_error) {
-    // console.error(error);
     return [];
   }
 }, 500);
@@ -90,7 +89,6 @@ export const searchLocations = async (
     ]) as {autoCompleteLocation: Record<string, unknown>[]};
     return autoCompleteLocation.map((item) => CustomClass(item));
   } catch(_error) {
-    // console.error(error);
     return [];
   }
 };
