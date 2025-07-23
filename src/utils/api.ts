@@ -16,6 +16,7 @@ export interface ApiOptions {
 
 export type ReaktorDbCollection =
   'apps' |
+  'contents' |
   'conversations' |
   'files' |
   'groups' |
@@ -76,27 +77,23 @@ export const getGraphql = async (
   const {expires = now, issued: _issued = now, token: currentToken}: SessionType = (flux.getState('user.session') || {}) as SessionType;
   let token: string | undefined;
 
-  // console.log('getGraphql::authenticate', {authenticate, currentToken});
   if(authenticate) {
     const nowDate: DateTime = DateTime.local();
     const expiresDate: DateTime = DateTime.fromMillis(expires);
     const expiredDiff: number = Math.round(expiresDate.diff(nowDate, 'minutes').toObject().minutes);
     token = currentToken;
 
-    // console.log('getGraphql::expiredDiff', expiredDiff);
     if(expiredDiff > 0) {
       const sessionMin: number = Config.get('app.session.minMinutes', 0);
       const issuedDate: DateTime = DateTime.fromMillis(expires);
       const issuedDiff: number = Math.round(nowDate.diff(issuedDate, 'minutes').toObject().minutes);
 
-      // console.log({issued, issuedDiff, sessionMin});
       if(issuedDiff >= sessionMin) {
         const {
           session: updatedSession = {}
         }: ApiResultsType = (await refreshSession(flux, currentToken, sessionMin)) || {};
         const {token: newToken}: SessionType = (updatedSession || {});
 
-        // console.log({newToken});
         if(!newToken) {
           Promise.reject(new ApiError(['invalid_session'], 'invalid_session'));
         }
@@ -105,8 +102,6 @@ export const getGraphql = async (
       }
     }
   }
-
-  // console.log('getGraphql::query', {query, token, url});
   return graphqlQuery(url, query, {token: token || ''})
     .then(async (results) => {
       await flux.dispatch({type: APP_CONSTANTS.API_NETWORK_SUCCESS});
@@ -117,7 +112,6 @@ export const getGraphql = async (
     .catch(async (error) => {
       const {errors = []} = error;
 
-      // console.log({error});
       if(onSuccess && errors.includes('network_error')) {
         await flux.dispatch({retry, type: APP_CONSTANTS.API_NETWORK_ERROR});
         return Promise.reject(error);

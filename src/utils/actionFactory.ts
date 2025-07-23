@@ -4,7 +4,8 @@
  */
 
 
-// Import all action creators
+
+import {createContentActions} from '../actions/contentActions/contentActions';
 import {createEventActions} from '../actions/eventActions/eventActions';
 import {createImageActions} from '../actions/imageActions/imageActions';
 import {createLocationActions} from '../actions/locationActions/locationActions';
@@ -18,6 +19,7 @@ import {createUserActions} from '../actions/userActions/userActions';
 import {createWebsocketActions} from '../actions/websocketActions/websocketActions';
 
 import type {FluxFramework} from '@nlabs/arkhamjs';
+import type {ContentActionsOptions} from '../actions/contentActions/contentActions';
 import type {EventActionsOptions} from '../actions/eventActions/eventActions';
 import type {ImageActionsOptions} from '../actions/imageActions/imageActions';
 import type {LocationActionsOptions} from '../actions/locationActions/locationActions';
@@ -30,6 +32,7 @@ import type {TagActionsOptions} from '../actions/tagActions/tagActions';
 import type {UserActionsOptions} from '../actions/userActions/userActions';
 
 export type ActionType =
+  | 'content'
   | 'event'
   | 'image'
   | 'location'
@@ -43,6 +46,7 @@ export type ActionType =
   | 'websocket';
 
 export type ActionOptions =
+  | ContentActionsOptions
   | EventActionsOptions
   | ImageActionsOptions
   | LocationActionsOptions
@@ -61,6 +65,9 @@ export const createAction = <T extends ActionType>(
   options?: ActionOptions
 ) => {
   switch(actionType) {
+    case 'content':
+      return createContentActions(flux, options as ContentActionsOptions);
+
     case 'event':
       return createEventActions(flux, options as EventActionsOptions);
 
@@ -118,6 +125,7 @@ export const createAllActions = (
   options?: Partial<Record<ActionType, ActionOptions>>
 ) => {
   const allActionTypes: ActionType[] = [
+    'content',
     'event',
     'image',
     'location',

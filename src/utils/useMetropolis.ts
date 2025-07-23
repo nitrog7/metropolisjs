@@ -8,6 +8,7 @@ export const useMetropolis = () => {
   const flux = useFlux();
   const {adapters} = useContext(MetropolisContext);
   const {
+    Content: contentAdapter,
     Event: eventAdapter,
     Image: imageAdapter,
     Location: locationAdapter,
@@ -20,8 +21,8 @@ export const useMetropolis = () => {
   } = adapters || {};
 
   return useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const {
+      content,
       event,
       image,
       location,
@@ -33,7 +34,7 @@ export const useMetropolis = () => {
       user,
       websocket
     } = createAllActions(flux, {
-      // Use type assertions to bridge the gap between the adapter signatures
+      content: contentAdapter ? {contentAdapter: contentAdapter as any} : undefined,
       event: eventAdapter ? {eventAdapter: eventAdapter as any} : undefined,
       image: imageAdapter ? {imageAdapter: imageAdapter as any} : undefined,
       location: locationAdapter ? {locationAdapter: locationAdapter as any} : undefined,
@@ -46,6 +47,7 @@ export const useMetropolis = () => {
     });
 
     return {
+      contentActions: content,
       eventActions: event,
       imageActions: image,
       locationActions: location,
@@ -59,6 +61,7 @@ export const useMetropolis = () => {
     };
   }, [
     flux,
+    contentAdapter,
     eventAdapter,
     imageAdapter,
     locationAdapter,
